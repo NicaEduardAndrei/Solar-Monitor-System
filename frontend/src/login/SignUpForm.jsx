@@ -1,6 +1,7 @@
 import axios from "axios"
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { IP } from "../../config";
 
 export function SignUpForm({ setAuth }) {
 
@@ -15,7 +16,7 @@ export function SignUpForm({ setAuth }) {
     const authSignup = async () => {
         try {
 
-            const response = await axios.post("http://localhost:3000/auth/register", {
+            const response = await axios.post(`http://${IP}:3000/auth/register`, {
                 username: userInfo.username,
                 email: userInfo.email,
                 password: userInfo.password

@@ -1,0 +1,1 @@
+export const IP = import.meta.env.VITE_IP;

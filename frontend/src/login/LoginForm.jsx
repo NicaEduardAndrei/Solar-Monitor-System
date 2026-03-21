@@ -1,3 +1,4 @@
+import { IP } from "../../config";
 import { useState } from "react";
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
@@ -16,7 +17,7 @@ export function LoginForm({ setAuth }) {
     const authLogin = async () => {
         try {
 
-            const response = await axios.post("http://localhost:3000/auth/login", {
+            const response = await axios.post(`http://${IP}:3000/auth/login`, {
                 email: userInfo.email,
                 password: userInfo.password
             })
