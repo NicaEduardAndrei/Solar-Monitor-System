@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+
+body {
+    margin: 0;
+    color: rgb(229, 229, 229);
+    background-color: rgb(24, 24, 24);
+    font-family: 'Poppins', sans-serif;
+}
+
+
+
+html, body {
+    height: 100%;
+}
+
+
+.page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+
+    background-image: url('../assets/login/auth_background.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+
+.auth-container {
+    width: 420px;
+    height: 460px;
+
+    overflow: hidden;
+
+    background-color: rgb(34, 34, 34);
+    border-radius: 10px;
+    border: 1px solid rgb(60, 60, 60);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+
+    transition: box-shadow 0.5s ease;
+}
+
+
+.auth-slider {
+    display: flex;
+    width: 200%;
+    height: 100%;
+
+    transition: transform 0.5s ease-in-out;
+}
+
+.auth-slider.move {
+    transform: translateX(-50%);
+}
+
+
+.auth-form {
+    width: 50%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 0px 40px;
+}
+
+.titles-container-login,
+.titles-container-signup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.titles-container-login{
+    margin-bottom: 40px;
+}
+
+.titles-container-signup{
+    margin-bottom: 22px;
+}
+
+
+.title {
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: rgb(170, 170, 170);
+    margin: 0;
+}
+
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-container input {
+    padding: 12px 14px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    background-color: rgb(40, 40, 40);
+    color: rgb(229, 229, 229);
+}
+
+.form-container input::placeholder {
+    color: rgb(140, 140, 140);
+}
+
+.form-container input:focus {
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.4);
+}
+
+
+.form-container button {
+    margin-top: 5px;
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    background-color: rgb(34, 197, 94);
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.form-container button:hover {
+    background-color: rgb(22, 163, 74);
+}
+
+
+
+.switch-auth {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.switch-auth span {
+    color: rgb(34, 197, 94);
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.switch-auth span:hover {
+    opacity: 0.8;
+}
+
+.auth-container:hover {
+    box-shadow: 0 10px 30px 10px rgba(0, 0, 0, 0.705);
+}
