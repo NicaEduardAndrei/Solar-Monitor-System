@@ -12,8 +12,52 @@ export function SignUpForm({ setAuth }) {
         email: "",
         password: ""
     })
+    const [error , setError] = useState("")
+
+    const isValidEmail = (email)=>{
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    const isValidUsername = (username)=>{
+        return /^(?![0-9]+$)[a-zA-Z0-9_. ]{3,20}$/.test(username)
+    }
+
+    const isValidPassword = (password)=>{
+        return /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(password)
+    }
 
     const authSignup = async () => {
+
+        setError("")
+
+        if (!userInfo.username){
+            setError("Username required")
+            return;
+        }
+        if (!isValidUsername(userInfo.username)){
+            setError("Username can only contain letters, numbers, underscores, and dots.")
+            return;
+        }
+        
+
+        if(!userInfo.email){
+            setError("Email required")
+            return;
+        }
+        if (!isValidEmail(userInfo.email)){
+            setError("Invalid email format")
+            return;
+        }
+
+        if (!userInfo.password){
+            setError("Password required")
+            return;
+        }
+        if (!isValidPassword(userInfo.password)){
+            setError("Password must be at least 8 characters and include a number")
+            return;
+        }
+
         try {
 
             const response = await axios.post(`http://${IP}:3000/auth/register`, {
@@ -28,12 +72,17 @@ export function SignUpForm({ setAuth }) {
             }
         } catch (err) {
             console.log("Eroare la login:", err.response?.data || err.message);
+            if ( err.response?.status === 409 ){
+                setError("An account with this email already exists. Try signing in.")
+            } else {
+                setError("Server error. Please try again later")
+            }
         }
     }
 
 
     return (
-        <div className="auth-form">
+        <div className="auth-form" onKeyDown={(e)=>{if(e.key === "Enter"){authSignup()}}}>
 
             <div className="titles-container-signup">
                 <p className="title">Create your account</p>
@@ -50,6 +99,7 @@ export function SignUpForm({ setAuth }) {
                 <input placeholder="Password" type="password" value={userInfo.password} onChange={(input)=>{
                     setUserInfo({...userInfo, password: input.target.value})
                 }} />
+                <span className="error-message">{error}</span>
                 <button onClick={authSignup}>Sign up</button>
             </div>
 
