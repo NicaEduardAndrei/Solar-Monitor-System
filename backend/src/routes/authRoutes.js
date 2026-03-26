@@ -55,7 +55,7 @@ router.post("/register", async (req, res) => {
         }
     })
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "10s" })
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" })
     res.json({ token })
 })
 
@@ -81,7 +81,7 @@ router.post("/login", async (req, res) => {
 
     if (!passwordIsValid) { return res.status(404).send({ message: "Invalid password" }) }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "10s" })
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" })
     res.json({ token })
 })
 
