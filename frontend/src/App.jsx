@@ -5,6 +5,7 @@ import { ManualCalibrationPage } from './dashboard/pages/ManualCalibrationPage'
 import { AuthPage } from './login/AuthPage'
 import { Routes , Route} from 'react-router-dom'
 import { FaqPage } from './dashboard/pages/FaqPage'
+import { LinkDevicePage } from './dashboard/pages/LinkDevicePage'
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
     <Routes>
       <Route index element={<AuthPage/>} />
       <Route path="dashboard" element={<DashboardLayout />}>
+        <Route path="linkdevice" element={<LinkDevicePage />} />
         <Route index element={<OverviewPage />} />
         <Route path='manualcalibration' element={<ManualCalibrationPage />} />
         <Route path='FAQ' element={<FaqPage />} />

@@ -15,7 +15,7 @@ router.post("/register", async (req, res) => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
 
 
-    if (!username || !usernameRegex.text(username)) {
+    if (!username || !usernameRegex.test(username)) {
         return res.status(400).json({
             message: "Invalid username format"
         })
