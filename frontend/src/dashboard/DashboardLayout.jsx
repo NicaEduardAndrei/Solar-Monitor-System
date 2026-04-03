@@ -17,10 +17,12 @@ export function DashboardLayout() {
     const navigate = useNavigate()
     const [user, setUser] = useState(null)
     const [weather, setWeather] = useState(null)
+    const [selectedButton, setSelectedButton] = useState("")
 
     useEffect(() => {
         const token = localStorage.getItem("token")
         console.log(token)
+        
         const isUser = async () => {
             try {
                 const response = await axios.get(`http://${IP}:3000/dashboard`, {
@@ -44,6 +46,9 @@ export function DashboardLayout() {
         getWeather()
     }, [navigate])
 
+     if (!user) {
+        return null;
+    }
 
     return (
         <>
@@ -53,8 +58,8 @@ export function DashboardLayout() {
                     <div className="profile-container">
                         {user?.username}
                         <div className="weather-info">
-                            <img className="weather-img" src={"https:" + weather?.current?.condition?.icon}/>
-                        <span>{weather?.current?.temp_c}°C {weather?.location?.name}</span>
+                            <img className="weather-img" src={"https:" + weather?.current?.condition?.icon} />
+                            <span>{weather?.current?.temp_c}°C {weather?.location?.name}</span>
                         </div>
                     </div>
                     <div className="sidebar-title">
@@ -64,19 +69,22 @@ export function DashboardLayout() {
                     <div className="buttons-container">
                         <NavLink
                             to="/dashboard"
-                            className="side-button">
+                            className={selectedButton === "overview" ? "side-button-active" : "side-button"}
+                            onClick={() => { setSelectedButton("overview") }}>
                             <img src={overview} />
                             Overview
                         </NavLink>
                         <NavLink
                             to="manualcalibration"
-                            className="side-button">
+                            className={selectedButton === "manualCalibration" ? "side-button-active" : "side-button"}
+                            onClick={() => { setSelectedButton("manualCalibration") }}>
                             <img src={manualCalibration} />
                             Manual Calibration
                         </NavLink>
                         <NavLink
                             to="linkdevice"
-                            className="side-button">
+                            className={selectedButton === "linkDevice" ? "side-button-active" : "side-button"}
+                            onClick={() => { setSelectedButton("linkDevice") }}>
                             <img src={faq} />
                             F.A.Q
                         </NavLink>
@@ -88,19 +96,22 @@ export function DashboardLayout() {
                     <div className="buttons-container">
                         <NavLink
                             to="/dashboard"
-                            className="side-button">
+                            className={selectedButton === "overview2" ? "side-button-active" : "side-button"}
+                            onClick={() => { setSelectedButton("overview2") }}>
                             <img src={overview} />
                             Overview
                         </NavLink>
                         <NavLink
                             to="manualcalibration"
-                            className="side-button">
+                            className={selectedButton === "manualCalibration2" ? "side-button-active" : "side-button"}
+                            onClick={() => { setSelectedButton("manualCalibration2") }}>
                             <img src={manualCalibration} />
                             Manual Calibration
                         </NavLink>
                         <NavLink
                             to="linkdevice"
-                            className="side-button">
+                            className={selectedButton === "linkDevice2" ? "side-button-active" : "side-button"}
+                            onClick={() => { setSelectedButton("linkDevice2") }}>
                             <img src={faq} />
                             F.A.Q
                         </NavLink>
