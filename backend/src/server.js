@@ -2,8 +2,10 @@ import express from "express"
 import authRoutes from "./routes/authRoutes.js"
 import authMiddleware from "./middleware/authMiddleware.js"
 import dashboardRoutes from "./routes/dashboardRoutes.js"
+import deviceRoutes from "./routes/deviceRoutes.js"
 import cors from "cors"
 import dotenv from "dotenv"
+import deviceMiddleware from "./middleware/deviceMiddleware.js"
 
 
 dotenv.config()
@@ -29,7 +31,7 @@ app.use(cors({
 //Routes
 app.use("/auth", authRoutes)
 app.use("/dashboard" , authMiddleware , dashboardRoutes)
-
+app.use("/device",deviceMiddleware, deviceRoutes)
 
 
 
