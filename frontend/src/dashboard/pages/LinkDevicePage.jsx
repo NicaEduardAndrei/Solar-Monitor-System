@@ -47,7 +47,7 @@ export function LinkDevicePage() {
             console.log(err.response?.data);
 
            if ( err.response?.status === 404 ){
-                setError("Invalid email or password")
+                setError("Invalid Device ID or password")
             } else {
                 setError("Server error. Please try again later")
             }

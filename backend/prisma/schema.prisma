@@ -23,25 +23,96 @@ datasource db {
 
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  username      String
+  email         String   @unique
+  password      String
+  createdAt     DateTime @default(now())
 
-  devices      Device[]
+  devices       Device[]
 }
 
 model Device {
-  id             Int      @id @default(autoincrement())
-  deviceId       String   @unique
-  claimSecret    String
-  createdAt      DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  deviceId        String   @unique
+  claimSecret     String
+  createdAt       DateTime @default(now())
 
-  userId         Int?
-  user           User?    @relation(fields: [userId], references: [id])
+  userId          Int?
+  user            User?    @relation(fields: [userId], references: [id])
+  sensorReadings  SensorReading[]
 }
 
+model SensorReading {
+  id          Int      @id @default(autoincrement())
+  deviceId    String
+  device      Device   @relation(fields: [deviceId], references: [deviceId], onDelete: Cascade)
+  timestamp   DateTime @default(now())
+  readingCount Int
+
+  solarV      Float?
+  solarVMin   Float?
+  solarVMax   Float?
+  solarA      Float?
+  solarAMin   Float?
+  solarAMax   Float?
+  solarW      Float?
+  solarWMin   Float?
+  solarWMax   Float?
+
+  gridV       Float?
+  gridVMin    Float?
+  gridVMax    Float?
+  gridA       Float?
+  gridAMin    Float?
+  gridAMax    Float?
+  gridW       Float?
+  gridWMin    Float?
+  gridWMax    Float?
+
+  battV       Float?
+  battVMin    Float?
+  battVMax    Float?
+  battA       Float?
+  battAMin    Float?
+  battAMax    Float?
+  battW       Float?
+  battWMin    Float?
+  battWMax    Float?
+  battTemp    Float?
+  battTempMin Float?
+  battTempMax Float?
+  battState   String?  // "charging" | "discharging" | "idle"
+
+  espTemp     Float?
+  espTempMin  Float?
+  espTempMax  Float?
+
+  internalV   Float?
+  internalVMin Float?
+  internalVMax Float?
+  internalA   Float?
+  internalAMin Float?
+  internalAMax Float?
+  internalW   Float?
+  internalWMin Float?
+  internalWMax Float?
+
+  externalV   Float?
+  externalVMin Float?
+  externalVMax Float?
+  externalA   Float?
+  externalAMin Float?
+  externalAMax Float?
+  externalW   Float?
+  externalWMin Float?
+  externalWMax Float?
+
+  relay1      Boolean?
+  relay2      Boolean?
+  relay3      Boolean?
+  relay4      Boolean?
+}
 
 
 // npx prisma migrate dev --name "name"

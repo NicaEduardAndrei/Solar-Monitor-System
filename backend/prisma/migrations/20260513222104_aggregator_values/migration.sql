@@ -1,0 +1,42 @@
+/*
+  Warnings:
+
+  - Added the required column `readingCount` to the `SensorReading` table without a default value. This is not possible if the table is not empty.
+
+*/
+-- AlterTable
+ALTER TABLE "SensorReading" ADD COLUMN     "battAMax" DOUBLE PRECISION,
+ADD COLUMN     "battAMin" DOUBLE PRECISION,
+ADD COLUMN     "battTempMax" DOUBLE PRECISION,
+ADD COLUMN     "battTempMin" DOUBLE PRECISION,
+ADD COLUMN     "battVMax" DOUBLE PRECISION,
+ADD COLUMN     "battVMin" DOUBLE PRECISION,
+ADD COLUMN     "battWMax" DOUBLE PRECISION,
+ADD COLUMN     "battWMin" DOUBLE PRECISION,
+ADD COLUMN     "espTempMax" DOUBLE PRECISION,
+ADD COLUMN     "espTempMin" DOUBLE PRECISION,
+ADD COLUMN     "externalAMax" DOUBLE PRECISION,
+ADD COLUMN     "externalAMin" DOUBLE PRECISION,
+ADD COLUMN     "externalVMax" DOUBLE PRECISION,
+ADD COLUMN     "externalVMin" DOUBLE PRECISION,
+ADD COLUMN     "externalWMax" DOUBLE PRECISION,
+ADD COLUMN     "externalWMin" DOUBLE PRECISION,
+ADD COLUMN     "gridAMax" DOUBLE PRECISION,
+ADD COLUMN     "gridAMin" DOUBLE PRECISION,
+ADD COLUMN     "gridVMax" DOUBLE PRECISION,
+ADD COLUMN     "gridVMin" DOUBLE PRECISION,
+ADD COLUMN     "gridWMax" DOUBLE PRECISION,
+ADD COLUMN     "gridWMin" DOUBLE PRECISION,
+ADD COLUMN     "internalAMax" DOUBLE PRECISION,
+ADD COLUMN     "internalAMin" DOUBLE PRECISION,
+ADD COLUMN     "internalVMax" DOUBLE PRECISION,
+ADD COLUMN     "internalVMin" DOUBLE PRECISION,
+ADD COLUMN     "internalWMax" DOUBLE PRECISION,
+ADD COLUMN     "internalWMin" DOUBLE PRECISION,
+ADD COLUMN     "readingCount" INTEGER NOT NULL,
+ADD COLUMN     "solarAMax" DOUBLE PRECISION,
+ADD COLUMN     "solarAMin" DOUBLE PRECISION,
+ADD COLUMN     "solarVMax" DOUBLE PRECISION,
+ADD COLUMN     "solarVMin" DOUBLE PRECISION,
+ADD COLUMN     "solarWMax" DOUBLE PRECISION,
+ADD COLUMN     "solarWMin" DOUBLE PRECISION;
