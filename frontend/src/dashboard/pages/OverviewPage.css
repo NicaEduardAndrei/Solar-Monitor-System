@@ -1,0 +1,327 @@
+
+.main-dashboard {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.dashboard-animation {
+    flex: 1;
+    padding: 0px 40px;
+    display: flex;
+    align-items: center;
+    width: 55%;
+    height: 99.36vh;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0);
+    border-style: solid;
+    border-width: 3px;
+    border-color: rgb(63, 104, 77);
+    border-radius: 10px;
+    
+}
+
+.energy-flow {
+    width: 55dvw;
+}
+
+.energy-flow path {
+    stroke: #707070;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 10 20;
+    transition: stroke 0.3s;
+}
+
+.energy-flow image {
+    filter: grayscale(100%) brightness(0.7);
+    transition: filter 0.3s;
+}
+
+.energy-flow text:not(.w-value) {
+    fill: #6b7280;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    transition: fill 0.3s;
+}
+
+.w-value {
+    fill: #6b7280;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    transition: fill 0.3s;
+}
+
+
+
+
+
+
+
+
+
+   /*SOLAR*/
+.energy-flow.solar-active #solar-to-mppt {
+    stroke: rgb(34, 197, 94);
+    animation: flow 0.8s linear infinite;
+}
+.energy-flow.solar-active #Solar {
+    fill: rgb(34, 197, 94);
+}
+.energy-flow.solar-active #solar-panel {
+    filter: invert(43%) sepia(85%) saturate(700%) hue-rotate(95deg) brightness(95%) contrast(90%);
+}
+.energy-flow.solar-active .w-solar {
+    fill: rgb(34, 197, 94);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+   /* GRID */
+.energy-flow.grid-active #grid-to-mppt {
+    stroke: rgb(34, 197, 94);
+    animation: flowReverse 0.8s linear infinite;
+}
+.energy-flow.grid-active #Grid {
+    fill: rgb(34, 197, 94);
+}
+.energy-flow.grid-active #grid {
+    filter: invert(43%) sepia(85%) saturate(700%) hue-rotate(95deg) brightness(95%) contrast(90%);
+}
+.energy-flow.grid-active .w-grid {
+    fill: rgb(34, 197, 94);
+}
+
+
+
+
+
+
+  /*MPPT*/
+.energy-flow.mppt-active #MPPT_2 {
+    fill: rgb(34, 197, 94);
+}
+.energy-flow.mppt-active #MPPT {
+    filter: invert(43%) sepia(85%) saturate(700%) hue-rotate(95deg) brightness(95%) contrast(90%);
+}
+.energy-flow.mppt-active .w-mppt {
+    fill: rgb(34, 197, 94);
+}
+.energy-flow.mppt-junction-active #mppt-to-point-connect {
+    stroke: rgb(34, 197, 94);
+    animation: flow 0.8s linear infinite;
+}
+
+
+
+
+
+
+
+  /*BATTERY CHARGING*/
+.energy-flow.battery-charging #point-connect-to-battery {
+    stroke: rgb(34, 197, 94);
+    animation: flowReverse 0.8s linear infinite;
+}
+.energy-flow.battery-charging #Battery {
+    fill: rgb(34, 197, 94);
+}
+.energy-flow.battery-charging #battery {
+    filter: invert(43%) sepia(85%) saturate(700%) hue-rotate(95deg) brightness(95%) contrast(90%);
+}
+.energy-flow.battery-charging .w-battery {
+    fill: rgb(34, 197, 94);
+}
+
+
+
+
+
+
+
+
+   /*BATTERY DISCHARGING*/
+.energy-flow.battery-discharging #point-connect-to-battery {
+    stroke: rgb(34, 197, 94);
+    animation: flow 0.8s linear infinite;
+}
+.energy-flow.battery-discharging #Battery {
+    fill: rgb(34, 197, 94);
+}
+.energy-flow.battery-discharging #battery {
+    filter: invert(43%) sepia(85%) saturate(700%) hue-rotate(95deg) brightness(95%) contrast(90%);
+}
+.energy-flow.battery-discharging .w-battery {
+    fill: rgb(34, 197, 94);
+}
+
+
+
+
+
+
+
+
+
+   /*INTERNAL*/
+.energy-flow.internal-active #point-connect-to-internal {
+    stroke: rgb(34, 197, 94);
+    animation: flow 0.8s linear infinite;
+}
+.energy-flow.internal-active #point-connect-more-to-down {
+    stroke: rgb(34, 197, 94);
+    animation: flow 0.8s linear infinite;
+}
+.energy-flow.internal-active #Internal-Load {
+    fill: rgb(34, 197, 94);
+}
+.energy-flow.internal-active #internal {
+    filter: invert(43%) sepia(85%) saturate(700%) hue-rotate(95deg) brightness(95%) contrast(90%);
+}
+.energy-flow.internal-active .w-internal {
+    fill: rgb(34, 197, 94);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*EXTERN*/
+.energy-flow.external-active #point-connect-more-more-to-down {
+    stroke: rgb(34, 197, 94);
+    animation: flow 0.8s linear infinite;
+}
+.energy-flow.external-active #point-connect-more-to-down {
+    stroke: rgb(34, 197, 94);
+    animation: flow 0.8s linear infinite;
+}
+.energy-flow.external-active #down-to-house {
+    stroke: rgb(34, 197, 94);
+    animation: flow 0.8s linear infinite;
+}
+.energy-flow.external-active #Out {
+    fill: rgb(34, 197, 94);
+}
+.energy-flow.external-active #house {
+    filter: invert(43%) sepia(85%) saturate(700%) hue-rotate(95deg) brightness(95%) contrast(90%);
+}
+.energy-flow.external-active .w-external-h {
+    fill: rgb(34, 197, 94);
+}
+
+
+
+
+
+
+
+
+
+/*Animatii*/
+@keyframes flow {
+    to { stroke-dashoffset: -30; }
+}
+
+@keyframes flowReverse {
+    to { stroke-dashoffset: 30; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.dashboard-data {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 255, 0);
+}
+.data-section{
+    padding:0px ;
+    margin:0px;
+    background-color: rgba(0, 0, 0, 0);
+    display: flex;
+    gap:20px;
+    align-items: center;
+}
+.connecting {
+    color: #94a3b8;
+    font-size: 18px;
+    text-align: center;
+    padding: 40px;
+}
+
+
+
+
+
+
+.loading-screen{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.animation{
+    width: 70%;
+    filter: invert(40%) sepia(78%) saturate(600%) hue-rotate(93deg) brightness(70%) contrast(92%);
+}
+
+.scene {
+    width: 850px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+}
+
+.connecting{
+    font-size: 30px;
+    color: rgb(34, 197, 94);
+    font-weight: bold;
+}
+
+.info{
+    text-align: center;
+    color: rgb(34, 197, 94);
+}
+
+.info-text{
+    text-align: left;
+    padding-left: 100px;
+}
+

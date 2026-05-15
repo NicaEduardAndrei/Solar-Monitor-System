@@ -21,7 +21,7 @@ function startWebSocket(server) {
                         where: { userId: decoded.id }
                     })
 
-                    clients.set(ws, devices.map())
+                    clients.set(ws, devices.map(d => d.deviceId))
                     console.log(`[WS] User ${decoded.id} connected with ${devices.length} ${devices.length > 1 ? "devices" : "device"}`)
                     return
                 }
