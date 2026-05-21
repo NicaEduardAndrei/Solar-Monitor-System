@@ -6,6 +6,7 @@ import { AuthPage } from './login/AuthPage'
 import { Routes , Route} from 'react-router-dom'
 import { FaqPage } from './dashboard/pages/FaqPage'
 import { LinkDevicePage } from './dashboard/pages/LinkDevicePage'
+import { History } from './dashboard/pages/HistoryPage'
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
         <Route index element={<OverviewPage />} />
         <Route path='manualcalibration' element={<ManualCalibrationPage />} />
         <Route path='FAQ' element={<FaqPage />} />
+        <Route path="history" element={<History />} />
         </Route>
     </Routes>
   )

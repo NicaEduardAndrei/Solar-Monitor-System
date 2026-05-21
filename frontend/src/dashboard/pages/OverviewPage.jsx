@@ -166,38 +166,38 @@ export function OverviewPage() {
 
 
                     <text className="w-value w-external-h" x="430" y="529" textAnchor="middle">
-                        {liveData.externalW?.toFixed(1)} W
+                        {liveData.externalW?.toFixed(3)} W
                     </text>
                     <text className="w-value w-external-h" x="637" y="529" textAnchor="middle">
-                        {liveData.externalV?.toFixed(1)} V
+                        {liveData.externalV?.toFixed(2)} V
                     </text>
                     <text className="w-value w-external-h" x="637" y="569" textAnchor="middle">
-                        {liveData.externalA?.toFixed(1)} A
+                        {liveData.externalA?.toFixed(3)} A
                     </text>
 
 
 
 
-                    <text className="w-value w-external-h" x="0" y="470" textAnchor="right">
+                    <text className="info-text" x="0" y="470" textAnchor="right">
                         Battery temp: {liveData.battTemp?.toFixed(1)} ℃
                     </text>
-                    <text className="w-value w-external-h" x="0" y="490" textAnchor="right">
+                    <text className="info-text" x="0" y="490" textAnchor="right">
                         Battery state: {liveData.battState}
                     </text>
-                    <text className="w-value w-external-h" x="0" y="510" textAnchor="right">
+                    <text className="info-text" x="0" y="510" textAnchor="right">
                         Esp temp: {liveData.espTemp?.toFixed(1)} ℃
                     </text>
-                    <text className="w-value w-external-h" x="0" y="530" textAnchor="right">
-                        Grid open: {liveData.relay1}
+                    <text className="info-text" x="0" y="530" textAnchor="right">
+                        Grid : {liveData.relay1 === true ? "Open" : "Closed"}
                     </text>
-                    <text className="w-value w-external-h" x="0" y="550" textAnchor="right">
-                        Solar open: {liveData.relay1}
+                    <text className="info-text" x="0" y="550" textAnchor="right">
+                        Solar : {liveData.relay2 === true ? "Open" : "Closed"}
                     </text>
-                    <text className="w-value w-external-h" x="0" y="570" textAnchor="right">
-                        x open: {liveData.relay1}
+                    <text className="info-text" x="0" y="570" textAnchor="right">
+                        x : {liveData.relay3 === true ? "Open" : "Closed"}
                     </text>
-                    <text className="w-value w-external-h" x="0" y="590" textAnchor="right">
-                        y open: {liveData.relay1}
+                    <text className="info-text" x="0" y="590" textAnchor="right">
+                        y : {liveData.relay4 === true ? "Open" : "Closed"}
                     </text>
 
 

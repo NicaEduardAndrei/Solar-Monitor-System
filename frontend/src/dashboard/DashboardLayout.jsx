@@ -11,6 +11,7 @@ import manualCalibration from "../assets/dashboard/sidebar/manualCalibration.png
 import faq from "../assets/dashboard/sidebar/faq.png"
 import solarPanel from "../assets/dashboard/sidebar/solarPanel.png"
 import settings from "../assets/dashboard/sidebar/settings.png"
+import history from "../assets/dashboard/sidebar/charts.png"
 
 export function DashboardLayout() {
     const navigate = useNavigate()
@@ -43,7 +44,7 @@ export function DashboardLayout() {
 
         const getWeather = async () => {
             const response = await axios.get(
-                `https://api.weatherapi.com/v1/current.json?key=${weatherAPI}&q=44.96,26.03`
+                `https://api.weatherapi.com/v1/current.json?key=${weatherAPI}&q=Ploiesti`
             )
             setWeather(response.data)
         }
@@ -108,6 +109,21 @@ export function DashboardLayout() {
                         </NavLink>
 
                         <NavLink
+                            to="history"
+                            className={selectedButton === "history" ? "side-button-active" : "side-button"}
+                            onClick={(e) => {
+                                if (!hasDevice) {
+                                    e.preventDefault()
+                                    return
+                                }
+                                setSelectedButton("history")
+                            }}
+                        >
+                            <img src={history} />
+                            History
+                        </NavLink>
+
+                        <NavLink
                             to="manualcalibration"
                             className={selectedButton === "manualCalibration" ? "side-button-active" : "side-button"}
                             onClick={(e) => {
@@ -137,6 +153,7 @@ export function DashboardLayout() {
                             F.A.Q
                         </NavLink>
                     </div>
+
 
                     <div className="sidebar-title">
                         <span>Settings</span>

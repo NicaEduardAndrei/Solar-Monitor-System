@@ -41,6 +41,7 @@ model Device {
   userId          Int?
   user            User?    @relation(fields: [userId], references: [id])
   sensorReadings  SensorReading[]
+  sensorReadingDailies SensorReadingDaily[]
 }
 
 model SensorReading {
@@ -50,63 +51,63 @@ model SensorReading {
   timestamp   DateTime @default(now())
   readingCount Int
 
-  solarV      Float?
-  solarVMin   Float?
-  solarVMax   Float?
-  solarA      Float?
-  solarAMin   Float?
-  solarAMax   Float?
-  solarW      Float?
-  solarWMin   Float?
-  solarWMax   Float?
+  solarV      Decimal?  @db.Decimal(8, 3)
+  solarVMin   Decimal?  @db.Decimal(8, 3)
+  solarVMax   Decimal?  @db.Decimal(8, 3)
+  solarA      Decimal?  @db.Decimal(8, 3)
+  solarAMin   Decimal?  @db.Decimal(8, 3)
+  solarAMax   Decimal?  @db.Decimal(8, 3)
+  solarW      Decimal?  @db.Decimal(8, 3)
+  solarWMin   Decimal?  @db.Decimal(8, 3)
+  solarWMax   Decimal?  @db.Decimal(8, 3)
 
-  gridV       Float?
-  gridVMin    Float?
-  gridVMax    Float?
-  gridA       Float?
-  gridAMin    Float?
-  gridAMax    Float?
-  gridW       Float?
-  gridWMin    Float?
-  gridWMax    Float?
+  gridV       Decimal?  @db.Decimal(8, 3)
+  gridVMin    Decimal?  @db.Decimal(8, 3)
+  gridVMax    Decimal?  @db.Decimal(8, 3)
+  gridA       Decimal?  @db.Decimal(8, 3)
+  gridAMin    Decimal?  @db.Decimal(8, 3)
+  gridAMax    Decimal?  @db.Decimal(8, 3)
+  gridW       Decimal?  @db.Decimal(8, 3)
+  gridWMin    Decimal?  @db.Decimal(8, 3)
+  gridWMax    Decimal?  @db.Decimal(8, 3)
 
-  battV       Float?
-  battVMin    Float?
-  battVMax    Float?
-  battA       Float?
-  battAMin    Float?
-  battAMax    Float?
-  battW       Float?
-  battWMin    Float?
-  battWMax    Float?
-  battTemp    Float?
-  battTempMin Float?
-  battTempMax Float?
-  battState   String?  // "charging" | "discharging" | "idle"
+  battV       Decimal?  @db.Decimal(8, 3)
+  battVMin    Decimal?  @db.Decimal(8, 3)
+  battVMax    Decimal?  @db.Decimal(8, 3)
+  battA       Decimal?  @db.Decimal(8, 3)
+  battAMin    Decimal?  @db.Decimal(8, 3)
+  battAMax    Decimal?  @db.Decimal(8, 3)
+  battW       Decimal?  @db.Decimal(8, 3)
+  battWMin    Decimal?  @db.Decimal(8, 3)
+  battWMax    Decimal?  @db.Decimal(8, 3)
+  battTemp    Decimal?  @db.Decimal(8, 3)
+  battTempMin Decimal?  @db.Decimal(8, 3)
+  battTempMax Decimal?  @db.Decimal(8, 3)
+  battState   String?
 
-  espTemp     Float?
-  espTempMin  Float?
-  espTempMax  Float?
+  espTemp     Decimal?  @db.Decimal(8, 3)
+  espTempMin  Decimal?  @db.Decimal(8, 3)
+  espTempMax  Decimal?  @db.Decimal(8, 3)
 
-  internalV   Float?
-  internalVMin Float?
-  internalVMax Float?
-  internalA   Float?
-  internalAMin Float?
-  internalAMax Float?
-  internalW   Float?
-  internalWMin Float?
-  internalWMax Float?
+  internalV   Decimal?  @db.Decimal(8, 3)
+  internalVMin Decimal? @db.Decimal(8, 3)
+  internalVMax Decimal? @db.Decimal(8, 3)
+  internalA   Decimal?  @db.Decimal(8, 3)
+  internalAMin Decimal? @db.Decimal(8, 3)
+  internalAMax Decimal? @db.Decimal(8, 3)
+  internalW   Decimal?  @db.Decimal(8, 3)
+  internalWMin Decimal? @db.Decimal(8, 3)
+  internalWMax Decimal? @db.Decimal(8, 3)
 
-  externalV   Float?
-  externalVMin Float?
-  externalVMax Float?
-  externalA   Float?
-  externalAMin Float?
-  externalAMax Float?
-  externalW   Float?
-  externalWMin Float?
-  externalWMax Float?
+  externalV   Decimal?  @db.Decimal(8, 3)
+  externalVMin Decimal? @db.Decimal(8, 3)
+  externalVMax Decimal? @db.Decimal(8, 3)
+  externalA   Decimal?  @db.Decimal(8, 3)
+  externalAMin Decimal? @db.Decimal(8, 3)
+  externalAMax Decimal? @db.Decimal(8, 3)
+  externalW   Decimal?  @db.Decimal(8, 3)
+  externalWMin Decimal? @db.Decimal(8, 3)
+  externalWMax Decimal? @db.Decimal(8, 3)
 
   relay1      Boolean?
   relay2      Boolean?
@@ -114,5 +115,76 @@ model SensorReading {
   relay4      Boolean?
 }
 
+
+model SensorReadingDaily {
+  id          Int      @id @default(autoincrement())
+  deviceId    String
+  device      Device   @relation(fields: [deviceId], references: [deviceId], onDelete: Cascade)
+  date        DateTime @default(now())
+  readingCount Int
+
+  solarV      Decimal?  @db.Decimal(8, 3)
+  solarVMin   Decimal?  @db.Decimal(8, 3)
+  solarVMax   Decimal?  @db.Decimal(8, 3)
+  solarA      Decimal?  @db.Decimal(8, 3)
+  solarAMin   Decimal?  @db.Decimal(8, 3)
+  solarAMax   Decimal?  @db.Decimal(8, 3)
+  solarW      Decimal?  @db.Decimal(8, 3)
+  solarWMin   Decimal?  @db.Decimal(8, 3)
+  solarWMax   Decimal?  @db.Decimal(8, 3)
+
+  gridV       Decimal?  @db.Decimal(8, 3)
+  gridVMin    Decimal?  @db.Decimal(8, 3)
+  gridVMax    Decimal?  @db.Decimal(8, 3)
+  gridA       Decimal?  @db.Decimal(8, 3)
+  gridAMin    Decimal?  @db.Decimal(8, 3)
+  gridAMax    Decimal?  @db.Decimal(8, 3)
+  gridW       Decimal?  @db.Decimal(8, 3)
+  gridWMin    Decimal?  @db.Decimal(8, 3)
+  gridWMax    Decimal?  @db.Decimal(8, 3)
+
+  battV       Decimal?  @db.Decimal(8, 3)
+  battVMin    Decimal?  @db.Decimal(8, 3)
+  battVMax    Decimal?  @db.Decimal(8, 3)
+  battA       Decimal?  @db.Decimal(8, 3)
+  battAMin    Decimal?  @db.Decimal(8, 3)
+  battAMax    Decimal?  @db.Decimal(8, 3)
+  battW       Decimal?  @db.Decimal(8, 3)
+  battWMin    Decimal?  @db.Decimal(8, 3)
+  battWMax    Decimal?  @db.Decimal(8, 3)
+  battTemp    Decimal?  @db.Decimal(8, 3)
+  battTempMin Decimal?  @db.Decimal(8, 3)
+  battTempMax Decimal?  @db.Decimal(8, 3)
+  battState   String?
+
+  espTemp     Decimal?  @db.Decimal(8, 3)
+  espTempMin  Decimal?  @db.Decimal(8, 3)
+  espTempMax  Decimal?  @db.Decimal(8, 3)
+
+  internalV   Decimal?  @db.Decimal(8, 3)
+  internalVMin Decimal? @db.Decimal(8, 3)
+  internalVMax Decimal? @db.Decimal(8, 3)
+  internalA   Decimal?  @db.Decimal(8, 3)
+  internalAMin Decimal? @db.Decimal(8, 3)
+  internalAMax Decimal? @db.Decimal(8, 3)
+  internalW   Decimal?  @db.Decimal(8, 3)
+  internalWMin Decimal? @db.Decimal(8, 3)
+  internalWMax Decimal? @db.Decimal(8, 3)
+
+  externalV   Decimal?  @db.Decimal(8, 3)
+  externalVMin Decimal? @db.Decimal(8, 3)
+  externalVMax Decimal? @db.Decimal(8, 3)
+  externalA   Decimal?  @db.Decimal(8, 3)
+  externalAMin Decimal? @db.Decimal(8, 3)
+  externalAMax Decimal? @db.Decimal(8, 3)
+  externalW   Decimal?  @db.Decimal(8, 3)
+  externalWMin Decimal? @db.Decimal(8, 3)
+  externalWMax Decimal? @db.Decimal(8, 3)
+
+  relay1      Boolean?
+  relay2      Boolean?
+  relay3      Boolean?
+  relay4      Boolean?
+}
 
 // npx prisma migrate dev --name "name"

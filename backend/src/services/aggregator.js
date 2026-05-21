@@ -2,6 +2,7 @@ import broker from "./mqttBroker.js"
 import prisma from "../prismaClient.js"
 
 const FLUSH_INTERVAL = 0.5 * 60 * 1000
+const RELOAD_DEVICES_INTERVAL = 0.5 * 60 * 1000
 const SENSOR_FIELDS = [
     'solarV', 'solarA', 'solarW',
     'gridV', 'gridA', 'gridW',
@@ -14,6 +15,17 @@ const SENSOR_FIELDS = [
 const LATEST_FIELDS = ['battState', 'relay1', 'relay2', 'relay3', 'relay4']
 
 const state = new Map()
+let allDeviceIds = []
+
+async function loadDevicesFromDB() {
+    try {
+        const devices = await prisma.device.findMany({ select: { deviceId: true } })
+        allDeviceIds = devices.map(d => d.deviceId)
+        console.log(`[Aggregator] Loaded ${allDeviceIds.length} device(s) from DB`)
+    } catch (err) {
+        console.error('[Aggregator] Error loading devices from DB:', err.message)
+    }
+}
 
 
 function processTelemetry(deviceId, data) {
@@ -48,31 +60,38 @@ function processTelemetry(deviceId, data) {
 
 
 async function flushToDB() {
-    console.log(`[DEBUG] flushToDB called. state.size = ${state.size}`)
-    if (state.size === 0) return
+    console.log(`[DEBUG] flushToDB called. allDeviceIds.length = ${allDeviceIds.length}, state.size = ${state.size}`)
+    if (allDeviceIds.length === 0) return
 
-    console.log(`Inserting ${state.size} ${state.size > 1 ? "devices" : "device"} to DB...`)
+    console.log(`Inserting ${allDeviceIds.length} ${allDeviceIds.length > 1 ? "devices" : "device"} to DB...`)
 
     try {
         const readings = []
 
-        for (const [deviceId, deviceData] of state) {
+        for (const deviceId of allDeviceIds) {
+            const deviceData = state.get(deviceId) || {}
             const reading = { deviceId }
 
             for (const field of SENSOR_FIELDS) {
                 const s = deviceData[field]
                 if (s && s.count > 0) {
                     reading[field] = s.sum / s.count
-                    reading.readingCount = s.count
+                    reading.readingCount = (reading.readingCount || 0) + s.count
                     reading[`${field}Min`] = s.min
                     reading[`${field}Max`] = s.max
+                } else {
+                    reading[field] = 0
+                    reading[`${field}Min`] = 0
+                    reading[`${field}Max`] = 0
                 }
             }
 
+            if (!reading.readingCount) {
+                reading.readingCount = 0
+            }
+
             for (const field of LATEST_FIELDS) {
-                if (deviceData[field] !== undefined) {
-                    reading[field] = deviceData[field]
-                }
+                reading[field] = deviceData[field] !== undefined ? deviceData[field] : null
             }
 
             readings.push(reading)
@@ -92,6 +111,9 @@ broker.on('telemetry', ({ deviceId, data }) => {
     processTelemetry(deviceId, data)
 })
 
-setInterval(flushToDB, FLUSH_INTERVAL)
-
-console.log(`[Aggregator] Started. Flush interval: ${FLUSH_INTERVAL / 1000}s`)
+;(async () => {
+    await loadDevicesFromDB()
+    setInterval(flushToDB, FLUSH_INTERVAL)
+    setInterval(loadDevicesFromDB, RELOAD_DEVICES_INTERVAL)
+    console.log(`[Aggregator] Started. Flush interval: ${FLUSH_INTERVAL / 1000}s, Reload devices interval: ${RELOAD_DEVICES_INTERVAL / 1000}s`)
+})()
