@@ -131,3 +131,25 @@ a {
     filter: invert(66%) sepia(78%) saturate(398%) hue-rotate(93deg) brightness(70%) contrast(92%);
 }
 
+.logout-sidebar{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    padding-bottom: 40px;
+    background-color: rgba(0, 0, 0, 0);
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(49, 155, 102);
+}
+
+.logout-text{
+    cursor: pointer;
+}
+
+.logout-image{
+    width: 10%;
+    filter: invert(66%) sepia(78%) saturate(398%) hue-rotate(93deg) brightness(55%) contrast(92%);
+    margin-bottom: 18px;
+    margin-left: 7px;
+}

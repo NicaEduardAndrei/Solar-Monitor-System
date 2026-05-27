@@ -10,6 +10,20 @@ import websocket from "./services/websocket.js"
 import "./services/mqttBroker.js"
 import "./services/aggregator.js"
 
+// ── Refactorizare rulează ca proces separat (nu blochează MQTT) ──
+import { fork } from 'child_process';
+import path from 'path';
+
+const refactorProcess = fork(
+  path.resolve('./src/services/refactorReadings.js'),
+  [],
+  { env: { ...process.env, REFACTOR_MODE: 'scheduled' } }
+);
+
+refactorProcess.on('exit', (code) => {
+  console.log(`[Refactor] Process exited with code ${code}`);
+});
+
 
 
 dotenv.config()

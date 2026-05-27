@@ -1,8 +1,8 @@
 import broker from "./mqttBroker.js"
 import prisma from "../prismaClient.js"
 
-const FLUSH_INTERVAL = 0.5 * 60 * 1000
-const RELOAD_DEVICES_INTERVAL = 0.5 * 60 * 1000
+const FLUSH_INTERVAL = 5 * 60 * 1000
+const RELOAD_DEVICES_INTERVAL = 5 * 60 * 1000
 const SENSOR_FIELDS = [
     'solarV', 'solarA', 'solarW',
     'gridV', 'gridA', 'gridW',
@@ -32,7 +32,7 @@ function processTelemetry(deviceId, data) {
     if (!state.has(deviceId)) {
         state.set(deviceId, {})
     }
-    
+
     const deviceData = state.get(deviceId)
 
     for (const field of SENSOR_FIELDS) {
@@ -70,7 +70,10 @@ async function flushToDB() {
 
         for (const deviceId of allDeviceIds) {
             const deviceData = state.get(deviceId) || {}
-            const reading = { deviceId }
+            const reading = {
+                deviceId,
+                timestamp: new Date(Math.floor(Date.now() / 300000) * 300000)
+            }
 
             for (const field of SENSOR_FIELDS) {
                 const s = deviceData[field]
@@ -111,9 +114,9 @@ broker.on('telemetry', ({ deviceId, data }) => {
     processTelemetry(deviceId, data)
 })
 
-;(async () => {
-    await loadDevicesFromDB()
-    setInterval(flushToDB, FLUSH_INTERVAL)
-    setInterval(loadDevicesFromDB, RELOAD_DEVICES_INTERVAL)
-    console.log(`[Aggregator] Started. Flush interval: ${FLUSH_INTERVAL / 1000}s, Reload devices interval: ${RELOAD_DEVICES_INTERVAL / 1000}s`)
-})()
+    ; (async () => {
+        await loadDevicesFromDB()
+        setInterval(flushToDB, FLUSH_INTERVAL)
+        setInterval(loadDevicesFromDB, RELOAD_DEVICES_INTERVAL)
+        console.log(`[Aggregator] Started. Flush interval: ${FLUSH_INTERVAL / 1000}s, Reload devices interval: ${RELOAD_DEVICES_INTERVAL / 1000}s`)
+    })()

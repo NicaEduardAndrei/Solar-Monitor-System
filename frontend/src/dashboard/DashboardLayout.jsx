@@ -12,6 +12,8 @@ import faq from "../assets/dashboard/sidebar/faq.png"
 import solarPanel from "../assets/dashboard/sidebar/solarPanel.png"
 import settings from "../assets/dashboard/sidebar/settings.png"
 import history from "../assets/dashboard/sidebar/charts.png"
+import logout from "../assets/dashboard/sidebar/logout.png"
+import account from "../assets/dashboard/sidebar/account-settings.png"
 
 export function DashboardLayout() {
     const navigate = useNavigate()
@@ -44,7 +46,7 @@ export function DashboardLayout() {
 
         const getWeather = async () => {
             const response = await axios.get(
-                `https://api.weatherapi.com/v1/current.json?key=${weatherAPI}&q=Ploiesti`
+                `https://api.weatherapi.com/v1/current.json?key=${weatherAPI}&q=lipanesti`
             )
             setWeather(response.data)
         }
@@ -138,20 +140,6 @@ export function DashboardLayout() {
                             Manual Calibration
                         </NavLink>
 
-                        <NavLink
-                            to="faq"
-                            className={selectedButton === "linkDevice" ? "side-button-active" : "side-button"}
-                            onClick={(e) => {
-                                if (!hasDevice) {
-                                    e.preventDefault()
-                                    return
-                                }
-                                setSelectedButton("linkDevice")
-                            }}
-                        >
-                            <img src={faq} />
-                            F.A.Q
-                        </NavLink>
                     </div>
 
 
@@ -163,32 +151,17 @@ export function DashboardLayout() {
                     <div className="buttons-container">
                         <NavLink
                             to="/dashboard"
-                            className={selectedButton === "overview2" ? "side-button-active" : "side-button"}
+                            className={selectedButton === "account" ? "side-button-active" : "side-button"}
                             onClick={(e) => {
                                 if (!hasDevice) {
                                     e.preventDefault()
                                     return
                                 }
-                                setSelectedButton("overview2")
+                                setSelectedButton("account")
                             }}
                         >
-                            <img src={overview} />
-                            Overview
-                        </NavLink>
-
-                        <NavLink
-                            to="manualcalibration"
-                            className={selectedButton === "manualCalibration2" ? "side-button-active" : "side-button"}
-                            onClick={(e) => {
-                                if (!hasDevice) {
-                                    e.preventDefault()
-                                    return
-                                }
-                                setSelectedButton("manualCalibration2")
-                            }}
-                        >
-                            <img src={manualCalibration} />
-                            Manual Calibration
+                            <img src={account} />
+                            Account
                         </NavLink>
 
                         <NavLink
@@ -206,8 +179,14 @@ export function DashboardLayout() {
                             F.A.Q
                         </NavLink>
                     </div>
-
-                    <div>
+                            
+                    <div className="logout-sidebar">
+                        <p className="logout-text" 
+                            onClick={()=>{
+                                localStorage.removeItem("token")
+                                navigate("/")
+                            }}>Log Out</p>
+                        <img src={logout} className="logout-image"/>
                     </div>
                 </div>
 
