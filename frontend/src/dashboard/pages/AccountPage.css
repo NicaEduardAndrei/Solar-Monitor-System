@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+.link-container-account {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.link-form-account {
+    display: flex;
+    flex-direction: row;
+    padding: 0px 60px 40px 40px;
+    background-color: rgb(34, 34, 34);
+    border-radius: 10px;
+    border: 1px solid rgb(60, 60, 60);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.5s ease;
+}
+
+.link-form-account:hover {
+    box-shadow: 0 10px 30px 10px rgba(0, 0, 0, 0.705);
+}
+
+.titles-container-link-account {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    margin-right: 50px;
+    padding-top: 90px;
+}
+
+.title-account {
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.subtitle-account {
+    font-size: 16px;
+    color: rgb(170, 170, 170);
+    margin: 0;
+}
+
+.form-container-account {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-container-account p{
+    margin-bottom: 0px;
+    margin-top: 50px ;
+}
+
+.form-container-account input {
+    padding: 12px 14px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    background-color: rgb(40, 40, 40);
+    color: rgb(229, 229, 229);
+}
+
+.form-container-account input::placeholder {
+    color: rgb(140, 140, 140);
+}
+
+.form-container-account input:focus {
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.4);
+}
+
+.form-container-account button {
+    margin-top: 0px;
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    background-color: rgb(34, 197, 94);
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+
+.form-container-account button:hover {
+    background-color: rgb(22, 163, 74);
+}
+
+
+.account-info{
+    margin-top: 40px;
+    text-align: left;
+}
+
+
+.account-info .unlink-button {
+    background-color: rgb(255, 65, 65);
+    margin-top: 0px;
+    padding: 12px;
+    border-radius: 6px;
+    width: 100%;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+
+.account-info .unlink-button:hover {
+    background-color: rgb(180, 40, 40);
+}
+
+.success-message-account {
+    color: rgb(34, 197, 94);
+    justify-self: center;
+    font-size: 15px;
+}
+
+.error-message-account {
+    color: rgb(255, 67, 67);
+    justify-self: center;
+    font-size: 15px;
+}
+
+.error-container{
+    display: flex;
+    background-color: rgba(126, 95, 95, 0);
+    height: 50px;
+    width: 470px;
+    justify-content: center;
+    margin-top: 50px;
+}

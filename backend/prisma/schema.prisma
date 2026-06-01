@@ -74,6 +74,10 @@ model SensorReading {
   espTempMin  Decimal?  @db.Decimal(8, 3)
   espTempMax  Decimal?  @db.Decimal(8, 3)
 
+  battSoc     Decimal?  @db.Decimal(8, 3)
+  battSocMin  Decimal?  @db.Decimal(8, 3)
+  battSocMax  Decimal?  @db.Decimal(8, 3)
+
   internalV   Decimal?  @db.Decimal(8, 3)
   internalVMin Decimal? @db.Decimal(8, 3)
   internalVMax Decimal? @db.Decimal(8, 3)
@@ -146,6 +150,10 @@ model SensorReadingHourly {
   espTempMin  Decimal?  @db.Decimal(8, 3)
   espTempMax  Decimal?  @db.Decimal(8, 3)
 
+  battSoc     Decimal?  @db.Decimal(8, 3)
+  battSocMin  Decimal?  @db.Decimal(8, 3)
+  battSocMax  Decimal?  @db.Decimal(8, 3)
+
   internalV   Decimal?  @db.Decimal(8, 3)
   internalVMin Decimal? @db.Decimal(8, 3)
   internalVMax Decimal? @db.Decimal(8, 3)
@@ -217,6 +225,10 @@ model SensorReadingDaily {
   espTempMin  Decimal?  @db.Decimal(8, 3)
   espTempMax  Decimal?  @db.Decimal(8, 3)
 
+  battSoc     Decimal?  @db.Decimal(8, 3)
+  battSocMin  Decimal?  @db.Decimal(8, 3)
+  battSocMax  Decimal?  @db.Decimal(8, 3)
+
   internalV   Decimal?  @db.Decimal(8, 3)
   internalVMin Decimal? @db.Decimal(8, 3)
   internalVMax Decimal? @db.Decimal(8, 3)
@@ -287,6 +299,10 @@ model SensorReadingWeekly {
   espTemp     Decimal?  @db.Decimal(8, 3)
   espTempMin  Decimal?  @db.Decimal(8, 3)
   espTempMax  Decimal?  @db.Decimal(8, 3)
+
+  battSoc     Decimal?  @db.Decimal(8, 3)
+  battSocMin  Decimal?  @db.Decimal(8, 3)
+  battSocMax  Decimal?  @db.Decimal(8, 3)
 
   internalV   Decimal?  @db.Decimal(8, 3)
   internalVMin Decimal? @db.Decimal(8, 3)

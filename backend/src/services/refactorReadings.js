@@ -4,7 +4,7 @@ const SENSOR_FIELDS = [
   'solarV', 'solarA', 'solarW',
   'gridV', 'gridA', 'gridW',
   'battV', 'battA', 'battW', 'battTemp',
-  'espTemp',
+  'battSoc',
   'internalV', 'internalA', 'internalW',
   'externalV', 'externalA', 'externalW'
 ]

@@ -14,6 +14,7 @@ import settings from "../assets/dashboard/sidebar/settings.png"
 import history from "../assets/dashboard/sidebar/charts.png"
 import logout from "../assets/dashboard/sidebar/logout.png"
 import account from "../assets/dashboard/sidebar/account-settings.png"
+import pair from "../assets/dashboard/sidebar/pair.png"
 
 export function DashboardLayout() {
     const navigate = useNavigate()
@@ -58,12 +59,9 @@ export function DashboardLayout() {
 
     useEffect(() => {
         if (!user) return
-        if (!hasDevice && location.pathname !== "/dashboard/linkdevice") {
-            navigate("/dashboard/linkdevice")
+        if (!hasDevice && location.pathname !== "/dashboard/pair" && location.pathname !== "/dashboard/faq") {
+            navigate("/dashboard/pair")
             return
-        }
-        if (hasDevice && location.pathname === "/dashboard/linkdevice") {
-            navigate("/dashboard")
         }
     }, [user, hasDevice, location.pathname, navigate])
 
@@ -150,7 +148,7 @@ export function DashboardLayout() {
 
                     <div className="buttons-container">
                         <NavLink
-                            to="/dashboard"
+                            to="account"
                             className={selectedButton === "account" ? "side-button-active" : "side-button"}
                             onClick={(e) => {
                                 if (!hasDevice) {
@@ -165,15 +163,20 @@ export function DashboardLayout() {
                         </NavLink>
 
                         <NavLink
+                            to="pair"
+                            className={selectedButton === "pair" ? "side-button-active" : "side-button"}
+                            onClick={() => setSelectedButton("pair")}
+                        >
+                            <img src={pair} />
+                            Pair Device
+                        </NavLink>
+
+
+
+                        <NavLink
                             to="faq"
-                            className={selectedButton === "linkDevice2" ? "side-button-active" : "side-button"}
-                            onClick={(e) => {
-                                if (!hasDevice) {
-                                    e.preventDefault()
-                                    return
-                                }
-                                setSelectedButton("linkDevice2")
-                            }}
+                            className={selectedButton === "faq" ? "side-button-active" : "side-button"}
+                            onClick={() => setSelectedButton("faq")}
                         >
                             <img src={faq} />
                             F.A.Q

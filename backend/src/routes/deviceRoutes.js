@@ -32,7 +32,7 @@ router.post("/register", async (req, res) => {
         return res.json({
             message: "Device already registered",
             device: existingDevice,
-            // claimSecret: existingDevice.claimSecret
+            claimSecret: existingDevice.claimSecret
         })
     }
     const claimSecret = generateClaimSecret(10)

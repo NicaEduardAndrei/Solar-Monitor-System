@@ -25,3 +25,9 @@
     text-align: center;
     margin-bottom: 20px;
 }
+
+.link-container p.title {
+    font-size: 24px;
+    font-weight: 600;
+    color: rgb(229, 229, 229);
+}

@@ -1,4 +1,4 @@
-import { IP } from "../config"
+import { IP } from "../../config"
 
 let ws = null
 let listeners = []
@@ -37,4 +37,13 @@ export function onTelemetry(callback) {
 
 export function getLiveData() {
     return ws?.readyState === WebSocket.OPEN
-}                                         
+}
+
+
+export function sendCommand(deviceId, payload) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "command", deviceId, payload }))
+    } else {
+        console.error("WebSocket not connected")
+    }
+}

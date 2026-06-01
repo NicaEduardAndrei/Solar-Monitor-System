@@ -1,7 +1,7 @@
 import { WebSocketServer } from 'ws'
 import jwt from 'jsonwebtoken'
 import prisma from '../prismaClient.js'
-import broker from './mqttBroker.js'
+import broker, { sendCommand } from './mqttBroker.js'
 import { json } from 'express'
 
 
@@ -25,6 +25,23 @@ function startWebSocket(server) {
                     console.log(`[WS] User ${decoded.id} connected with ${devices.length} ${devices.length > 1 ? "devices" : "device"}`)
                     return
                 }
+
+
+                
+
+                if (data.type === 'command') {
+                    const deviceIds = clients.get(ws)
+                    if (!deviceIds || !deviceIds.includes(data.deviceId)) {
+                        ws.close()
+                        return
+                    }
+                    sendCommand(data.deviceId, 'manual', JSON.stringify(data.payload))
+                    console.log(`[WS] Command sent to ${data.deviceId}:`, data.payload)
+                    return
+                }
+
+
+
             } catch (err) {
                 ws.close()
             }

@@ -282,11 +282,6 @@
     padding: 40px;
 }
 
-
-
-
-
-
 .loading-screen{
     width: 100%;
     display: flex;
@@ -296,7 +291,7 @@
 }
 
 .animation{
-    width: 70%;
+    width: 100%;
     filter: invert(40%) sepia(78%) saturate(600%) hue-rotate(93deg) brightness(70%) contrast(92%);
 }
 

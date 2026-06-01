@@ -6,7 +6,7 @@ import { IP } from '../../../config'
 const fieldMap = {
   solar: { v: 'solarV', vMin: 'solarVMin', vMax: 'solarVMax', a: 'solarA', aMin: 'solarAMin', aMax: 'solarAMax', w: 'solarW', wMin: 'solarWMin', wMax: 'solarWMax' },
   grid: { v: 'gridV', vMin: 'gridVMin', vMax: 'gridVMax', a: 'gridA', aMin: 'gridAMin', aMax: 'gridAMax', w: 'gridW', wMin: 'gridWMin', wMax: 'gridWMax' },
-  battery: { v: 'battV', vMin: 'battVMin', vMax: 'battVMax', a: 'battA', aMin: 'battAMin', aMax: 'battAMax', w: 'battW', wMin: 'battWMin', wMax: 'battWMax' },
+  battery: { v: 'battV', vMin: 'battVMin', vMax: 'battVMax', a: 'battA', aMin: 'battAMin', aMax: 'battAMax', w: 'battW', wMin: 'battWMin', wMax: 'battWMax', soc: 'battSoc', socMin: 'battSocMin', socMax: 'battSocMax' },
   internal: { v: 'internalV', vMin: 'internalVMin', vMax: 'internalVMax', a: 'internalA', aMin: 'internalAMin', aMax: 'internalAMax', w: 'internalW', wMin: 'internalWMin', wMax: 'internalWMax' },
   external: { v: 'externalV', vMin: 'externalVMin', vMax: 'externalVMax', a: 'externalA', aMin: 'externalAMin', aMax: 'externalAMax', w: 'externalW', wMin: 'externalWMin', wMax: 'externalWMax' }
 }

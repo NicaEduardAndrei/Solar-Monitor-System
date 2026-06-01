@@ -185,7 +185,7 @@ export function OverviewPage() {
                         Battery state: {liveData.battState}
                     </text>
                     <text className="info-text" x="0" y="510" textAnchor="right">
-                        Esp temp: {liveData.espTemp?.toFixed(1)} ℃
+                        Battery SOC: {liveData.battSoc?.toFixed(1)} %
                     </text>
                     <text className="info-text" x="0" y="530" textAnchor="right">
                         Grid : {liveData.relay1 === true ? "Open" : "Closed"}
@@ -194,10 +194,10 @@ export function OverviewPage() {
                         Solar : {liveData.relay2 === true ? "Open" : "Closed"}
                     </text>
                     <text className="info-text" x="0" y="570" textAnchor="right">
-                        x : {liveData.relay3 === true ? "Open" : "Closed"}
+                        Battery : {liveData.relay3 === true ? "Open" : "Closed"}
                     </text>
                     <text className="info-text" x="0" y="590" textAnchor="right">
-                        y : {liveData.relay4 === true ? "Open" : "Closed"}
+                        External load : {liveData.relay4 === true ? "Open" : "Closed"}
                     </text>
 
 

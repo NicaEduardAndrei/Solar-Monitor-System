@@ -12,3 +12,24 @@
   gap: 12px;
   height: 100%;
 }
+
+.mini-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mini-charts-row .chart-card {
+  min-height: 0;
+}
+
+.placeholder-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-text {
+  color: #555;
+  font-size: 14px;
+}

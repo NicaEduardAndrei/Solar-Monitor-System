@@ -1,4 +1,4 @@
-import prisma from "./src/prismaClient.js"
+import prisma from "../src/prismaClient.js"
 
 const DEVICE_ID = "TEST-01"
 const DAYS = 730
@@ -83,8 +83,10 @@ function generateReading(timestamp) {
     const battTemp = 22 + seasonalFactor * 8 + (battCharging ? 3 : 0) + (Math.random() - 0.5) * 2
     const battState = battCharging ? "charging" : "discharging"
 
-    // ── ESP temp ──
-    const espTemp = 32 + seasonalFactor * 5 + (Math.random() - 0.5) * 4
+    // ── Battery SOC ──
+    const battSoc = battCharging
+        ? Math.min(100, 60 + solarFactor * 35 + (Math.random() - 0.5) * 5)
+        : Math.max(5, 40 - (1 - solarFactor) * 30 + (Math.random() - 0.5) * 5)
 
     // ── Internal load ──
     const internalV = noise(12.0, 0.02)
@@ -140,9 +142,9 @@ function generateReading(timestamp) {
         battTempMax: jitter(battTemp, 1),
         battState,
 
-        espTemp: +espTemp.toFixed(2),
-        espTempMin: jitter(espTemp, 1),
-        espTempMax: jitter(espTemp, 1),
+        battSoc: +battSoc.toFixed(2),
+        battSocMin: jitter(battSoc, 1),
+        battSocMax: jitter(battSoc, 1),
 
         internalV: +internalV.toFixed(2),
         internalVMin: jitter(internalV, 0.5),
@@ -191,7 +193,7 @@ function generateZeroReading(timestamp) {
         battTemp: 0, battTempMin: 0, battTempMax: 0,
         battState: "idle",
 
-        espTemp: 0, espTempMin: 0, espTempMax: 0,
+        battSoc: 0, battSocMin: 0, battSocMax: 0,
 
         internalV: 0, internalVMin: 0, internalVMax: 0,
         internalA: 0, internalAMin: 0, internalAMax: 0,

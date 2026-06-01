@@ -1,0 +1,29 @@
+.energy-table {
+    margin-top: 8px;
+    height: 250px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.energy-table th {
+    color: #22c55e;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-bottom: 2px solid #22c55e;
+    text-align: center;
+}
+
+.energy-table td {
+    padding: 3px 6px;
+    text-align: center;
+    color: #ccc;
+}
+
+.energy-table tbody tr {
+    border-bottom: 1px solid rgba(56, 145, 92, 0.164);
+}
+
+.energy-table tbody tr td:first-child {
+    color: #22c55e;
+    font-weight: bold;
+}

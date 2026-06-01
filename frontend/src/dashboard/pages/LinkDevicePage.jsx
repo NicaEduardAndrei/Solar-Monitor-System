@@ -1,17 +1,44 @@
 import { IP } from "../../../config";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import "./LinkDevicePage.css";
 import { useNavigate } from "react-router-dom";
 
 export function LinkDevicePage() {
     const navigate = useNavigate()
+    const [user, setUser] = useState(null)
     const [deviceInfo, setDeviceInfo] = useState({
         deviceId: "",
         claimSecret: ""
     });
 
     const [error, setError] = useState("");
+
+    useEffect(() => {
+        const token = localStorage.getItem("token")
+        const fetchUser = async () => {
+            try {
+                const response = await axios.get(`http://${IP}:3000/dashboard`, {
+                    headers: { Authorization: token }
+                })
+                setUser(response.data.user)
+            } catch {
+                localStorage.removeItem("token")
+                navigate("/")
+            }
+        }
+        fetchUser()
+    }, [navigate])
+
+    if (!user) return null
+
+    if (user.devices?.length > 0) {
+        return (
+            <div className="link-container">
+                <p className="title">You already have a device paired</p>
+            </div>
+        )
+    }
 
     const deviceLink = async () => {
         const token = localStorage.getItem("token");
@@ -22,7 +49,7 @@ export function LinkDevicePage() {
         }
 
         if (!deviceInfo.claimSecret) {
-            setError("Claim secret required");
+            setError("Password required");
             return;
         }
 
@@ -42,7 +69,7 @@ export function LinkDevicePage() {
 
             console.log(response.data);
             setError("");
-            navigate("/dashboard")
+            window.location.href = "/dashboard"
         } catch (err) {
             console.log(err.response?.data);
 
@@ -86,4 +113,3 @@ export function LinkDevicePage() {
         </>
     );
 }
-``
