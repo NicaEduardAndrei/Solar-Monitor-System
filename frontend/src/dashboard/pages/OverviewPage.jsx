@@ -16,7 +16,8 @@ export function OverviewPage() {
 
     useEffect(() => {
         const token = localStorage.getItem("token")
-        const ws = new WebSocket(`ws://${IP}:3000`)
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+        const ws = new WebSocket(`${protocol}//${IP}`)
 
         ws.onopen = () => ws.send(JSON.stringify({ type: "auth", token }))
         ws.onmessage = (e) => {

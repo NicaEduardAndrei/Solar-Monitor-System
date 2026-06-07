@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import './ChartCard.css'
-import { IP } from '../../../config'
+import { API_BASE } from '../../../config'
 
 const fieldMap = {
   solar: { v: 'solarV', vMin: 'solarVMin', vMax: 'solarVMax', a: 'solarA', aMin: 'solarAMin', aMax: 'solarAMax', w: 'solarW', wMin: 'solarWMin', wMax: 'solarWMax' },
@@ -21,7 +21,7 @@ export function ChartCard({ title, category }) {
     const fetchData = async () => {
       setLoading(true)
       const token = localStorage.getItem('token')
-      const res = await fetch(`http://${IP}:3000/dashboard/charts/${category}?range=${range}`, {
+      const res = await fetch(`${API_BASE}/dashboard/charts/${category}?range=${range}`, {
         headers: { Authorization: token }
       })
       const json = await res.json()

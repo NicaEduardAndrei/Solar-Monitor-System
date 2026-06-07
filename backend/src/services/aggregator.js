@@ -1,4 +1,4 @@
-import broker from "./mqttBroker.js"
+import { events } from "./websocket.js"
 import prisma from "../prismaClient.js"
 
 const FLUSH_INTERVAL = 5 * 60 * 1000
@@ -110,7 +110,7 @@ async function flushToDB() {
     }
 }
 
-broker.on('telemetry', ({ deviceId, data }) => {
+events.on('telemetry', ({ deviceId, data }) => {
     processTelemetry(deviceId, data)
 })
 

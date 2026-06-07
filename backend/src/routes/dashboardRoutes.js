@@ -1,5 +1,6 @@
 import express from 'express'
 import prisma from '../prismaClient.js'
+import { Prisma } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const router = express.Router()
@@ -112,59 +113,40 @@ router.get("/energy-summary", async (req, res) => {
     })
 
     const tableMap = {
-        "24h": { table: "SensorReading", hours: 24 },
-        "7d": { table: "SensorReading", hours: 168 },
-        "30d": { table: "SensorReadingHourly", hours: 720 },
-        "1y": { table: "SensorReadingDaily", hours: 8760 },
-        "all": { table: "SensorReadingWeekly", hours: null }
+        "24h": { table: "SensorReading", intervalHours: 5 / 60 },
+        "7d": { table: "SensorReading", intervalHours: 5 / 60 },
+        "30d": { table: "SensorReadingHourly", intervalHours: 1 },
+        "1y": { table: "SensorReadingDaily", intervalHours: 24 },
+        "all": { table: "SensorReadingWeekly", intervalHours: 168 }
     }
 
     const deviceId = devices[0].deviceId
-
     const config = tableMap[range] || tableMap["24h"]
     const rangeMs = { "24h": 86400000, "7d": 604800000, "30d": 2592000000, "1y": 31536000000 }
-    let hours = config.hours
-
-    if (range === "all") {
-        const first = await prisma[config.table].findFirst({
-            where: { deviceId, readingCount: { gte: 0 } },
-            orderBy: { timestamp: "asc" },
-            select: { timestamp: true }
-        })
-        if (!first) return res.json({ solarW: 0, gridW: 0, consumedW: 0 })
-        hours = (Date.now() - first.timestamp.getTime()) / 3600000
-    }
-
-
     const startDate = rangeMs[range] ? new Date(Date.now() - rangeMs[range]) : undefined
 
-    const result = await prisma.$queryRawUnsafe(`
-    SELECT
-        AVG("solarW") as "avgSolar",
-        AVG("gridW") as "avgGrid",
-        AVG("internalW") as "avgInternal",
-        AVG("externalW") as "avgExternal"
-    FROM "${config.table}"
-    WHERE "deviceId"='${deviceId}'
-      AND "readingCount" >= 0
-      ${startDate ? `AND "timestamp" >= '${startDate.toISOString()}'` : ''}
-`)
+    const conditions = [
+        Prisma.sql`"deviceId" = ${deviceId}`,
+        Prisma.sql`"readingCount" >= 0`
+    ]
+    if (startDate) {
+        conditions.push(Prisma.sql`"timestamp" >= ${startDate}`)
+    }
 
-
-    console.log('range:', range, 'startDate:', startDate?.toISOString(), 'hours:', hours)
-    console.log('query result:', result)
-
+    const result = await prisma.$queryRaw`
+        SELECT
+            COALESCE(SUM("solarW"), 0) * ${config.intervalHours} as "solarW",
+            COALESCE(SUM("gridW"), 0) * ${config.intervalHours} as "gridW",
+            COALESCE(SUM("internalW") + SUM("externalW"), 0) * ${config.intervalHours} as "consumedW"
+        FROM ${Prisma.raw(`"${config.table}"`)}
+        WHERE ${Prisma.join(conditions, ' AND ')}
+    `
 
     const row = result[0]
-    const avgSolar = parseFloat(row.avgSolar) || 0
-    const avgGrid = parseFloat(row.avgGrid) || 0
-    const avgInternal = parseFloat(row.avgInternal) || 0
-    const avgExternal = parseFloat(row.avgExternal) || 0
-
     res.json({
-        solarW: +(avgSolar * hours).toFixed(2),
-        gridW: +(avgGrid * hours).toFixed(2),
-        consumedW: +((avgInternal + avgExternal) * hours).toFixed(2)
+        solarW: +parseFloat(row.solarW).toFixed(2),
+        gridW: +parseFloat(row.gridW).toFixed(2),
+        consumedW: +parseFloat(row.consumedW).toFixed(2)
     })
 })
 

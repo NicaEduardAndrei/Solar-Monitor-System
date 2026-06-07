@@ -2,7 +2,7 @@ import Switch from "react-switch";
 import { useState, useEffect, useRef } from "react";
 import { connectWebSocket, onTelemetry, sendCommand } from "../../services/websocket"
 import axios from "axios";
-import { IP } from "../../../config.js"
+import { API_BASE } from "../../../config.js"
 import animationLoading from "../../assets/dashboard/animation/loading-animations/loading-animation.gif"
 import "./ManualCalibrationPage.css"
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
@@ -35,7 +35,7 @@ export function ManualCalibrationPage() {
     useEffect(() => {
         const fetchDevice = async () => {
             const token = localStorage.getItem("token")
-            const res = await axios.get(`http://${IP}:3000/dashboard`, {
+            const res = await axios.get(`${API_BASE}/dashboard`, {
                 headers: { Authorization: token }
             })
             if (res.data.user.devices.length > 0) {

@@ -3,12 +3,14 @@ import { IP } from "../../config"
 let ws = null
 let listeners = []
 let token = null
+let latestTelemetry = null
 
 export function connectWebSocket() {
     if (ws && ws.readyState === WebSocket.OPEN) return
 
     token = localStorage.getItem("token")
-    ws = new WebSocket(`ws://${IP}:3000`)
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+    ws = new WebSocket(`${protocol}//${IP}`)
 
     ws.onopen = () => {
         ws.send(JSON.stringify({ type: "auth", token }))
@@ -17,6 +19,7 @@ export function connectWebSocket() {
     ws.onmessage = (event) => {
         const message = JSON.parse(event.data)
         if (message.type === "telemetry") {
+            latestTelemetry = message.data
             listeners.forEach(fn => fn(message.data))
         }
     }
@@ -37,6 +40,10 @@ export function onTelemetry(callback) {
 
 export function getLiveData() {
     return ws?.readyState === WebSocket.OPEN
+}
+
+export function getLatestTelemetry() {
+    return latestTelemetry
 }
 
 

@@ -3,7 +3,18 @@
     flex: 1;
     justify-content: center;
     padding: 40px;
+    overflow-y: auto;
+    height: 100vh;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE / Edge */
 }
+&::-webkit-scrollbar {
+    /* Chrome/Safari */
+    display: none;
+}
+
 
 .faq-content-wrapper {
     width: 1500px;

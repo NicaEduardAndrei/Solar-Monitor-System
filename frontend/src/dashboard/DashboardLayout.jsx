@@ -1,8 +1,9 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { Outlet, useNavigate, NavLink, useLocation } from "react-router-dom"
-import { IP } from "../../config"
+import { API_BASE } from "../../config"
 import { weatherAPI } from "../../config"
+import { getLatestTelemetry, connectWebSocket } from "../services/websocket"
 
 import "./DashboardLayout.css"
 
@@ -30,7 +31,7 @@ export function DashboardLayout() {
 
         const isUser = async () => {
             try {
-                const response = await axios.get(`http://${IP}:3000/dashboard`, {
+                const response = await axios.get(`${API_BASE}/dashboard`, {
                     headers: {
                         Authorization: token
                     }
@@ -44,16 +45,28 @@ export function DashboardLayout() {
         }
 
         isUser()
+    }, [navigate, location.pathname])
+
+
+
+    useEffect(() => {
+
+        connectWebSocket()
 
         const getWeather = async () => {
+            const telemetry = getLatestTelemetry()
+            if (!telemetry?.lat || !telemetry?.long) return
+
             const response = await axios.get(
-                `https://api.weatherapi.com/v1/current.json?key=${weatherAPI}&q=lipanesti`
+                `https://api.weatherapi.com/v1/current.json?key=${weatherAPI}&q=${telemetry.lat},${telemetry.long}`
             )
             setWeather(response.data)
         }
 
         getWeather()
-    }, [navigate, location.pathname])
+        const interval = setInterval(getWeather, 1000)
+        return () => clearInterval(interval)
+    }, [])
 
     const hasDevice = user?.devices?.length > 0
 
@@ -76,15 +89,27 @@ export function DashboardLayout() {
                 <div className="sidebar-container">
                     <div className="profile-container">
                         {user?.username}
+
+
+
+
                         <div className="weather-info">
-                            <img
-                                className="weather-img"
-                                src={"https:" + weather?.current?.condition?.icon}
-                            />
-                            <span>
-                                {weather?.current?.temp_c}°C {weather?.location?.name}
-                            </span>
+                            {weather ? (
+                                <>
+                                    <img
+                                        className="weather-img"
+                                        src={"https:" + weather?.current?.condition?.icon}
+                                    />
+                                    <span>
+                                        {weather?.current?.temp_c}°C {weather?.location?.name}
+                                    </span>
+                                </>
+                            ) : (
+                                <span>Loading...</span>
+                            )}
                         </div>
+
+
                     </div>
 
                     <div className="sidebar-title">
@@ -179,17 +204,17 @@ export function DashboardLayout() {
                             onClick={() => setSelectedButton("faq")}
                         >
                             <img src={faq} />
-                            F.A.Q
+                            User Manual
                         </NavLink>
                     </div>
-                            
+
                     <div className="logout-sidebar">
-                        <p className="logout-text" 
-                            onClick={()=>{
+                        <p className="logout-text"
+                            onClick={() => {
                                 localStorage.removeItem("token")
                                 navigate("/")
                             }}>Log Out</p>
-                        <img src={logout} className="logout-image"/>
+                        <img src={logout} className="logout-image" />
                     </div>
                 </div>
 

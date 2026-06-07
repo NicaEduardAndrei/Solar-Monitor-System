@@ -1,7 +1,7 @@
 import axios from "axios"
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IP } from "../../config";
+import { API_BASE } from "../../config";
 
 export function SignUpForm({ setAuth }) {
 
@@ -60,7 +60,7 @@ export function SignUpForm({ setAuth }) {
 
         try {
 
-            const response = await axios.post(`http://${IP}:3000/auth/register`, {
+            const response = await axios.post(`${API_BASE}/auth/register`, {
                 username: userInfo.username,
                 email: userInfo.email,
                 password: userInfo.password

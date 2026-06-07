@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { IP } from '../../../config'
+import { API_BASE } from '../../../config'
 import "./EnergySummary.css"
 
 export function EnergySummary() {
@@ -17,7 +17,7 @@ export function EnergySummary() {
             const ranges = ['24h', '7d', '30d', '1y', 'all']
             const results = {}
             for (const r of ranges) {
-                const res = await axios.get(`http://${IP}:3000/dashboard/energy-summary`, {
+                const res = await axios.get(`${API_BASE}/dashboard/energy-summary`, {
                     params: { range: r },
                     headers: { Authorization: localStorage.getItem('token') }
                 })

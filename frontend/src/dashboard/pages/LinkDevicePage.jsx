@@ -1,4 +1,4 @@
-import { IP } from "../../../config";
+import { API_BASE } from "../../../config";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./LinkDevicePage.css";
@@ -18,7 +18,7 @@ export function LinkDevicePage() {
         const token = localStorage.getItem("token")
         const fetchUser = async () => {
             try {
-                const response = await axios.get(`http://${IP}:3000/dashboard`, {
+                const response = await axios.get(`${API_BASE}/dashboard`, {
                     headers: { Authorization: token }
                 })
                 setUser(response.data.user)
@@ -55,7 +55,7 @@ export function LinkDevicePage() {
 
         try {
             const response = await axios.post(
-                `http://${IP}:3000/dashboard/pair-device`,
+                `${API_BASE}/dashboard/pair-device`,
                 {
                     deviceId: deviceInfo.deviceId,
                     claimSecret: deviceInfo.claimSecret

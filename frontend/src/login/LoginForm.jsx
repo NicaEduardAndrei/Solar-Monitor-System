@@ -1,4 +1,4 @@
-import { IP } from "../../config";
+import { API_BASE } from "../../config";
 import { useState } from "react";
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
@@ -37,7 +37,7 @@ export function LoginForm({ setAuth })
 
         try {
 
-            const response = await axios.post(`http://${IP}:3000/auth/login`, {
+            const response = await axios.post(`${API_BASE}/auth/login`, {
                 email: userInfo.email,
                 password: userInfo.password
             })

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
-import { IP } from "../../../config"
+import { API_BASE } from "../../../config"
 import "./AccountPage.css"
 
 export function AccountPage() {
@@ -33,7 +33,7 @@ export function AccountPage() {
         const token = localStorage.getItem("token")
         const fetchUser = async () => {
             try {
-                const response = await axios.get(`http://${IP}:3000/dashboard`, {
+                const response = await axios.get(`${API_BASE}/dashboard`, {
                     headers: { Authorization: token }
                 })
                 setUser(response.data.user)
@@ -60,13 +60,13 @@ export function AccountPage() {
 
         try {
             const token = localStorage.getItem("token")
-            await axios.put(`http://${IP}:3000/dashboard/username`,
+            await axios.put(`${API_BASE}/dashboard/username`,
                 { username: usernameInput },
                 { headers: { Authorization: token } }
             )
             setSuccess("Username updated successfully")
             setUsernameInput("")
-            const response = await axios.get(`http://${IP}:3000/dashboard`, {
+            const response = await axios.get(`${API_BASE}/dashboard`, {
                 headers: { Authorization: token }
             })
             setUser(response.data.user)
@@ -94,13 +94,13 @@ export function AccountPage() {
 
         try {
             const token = localStorage.getItem("token")
-            await axios.put(`http://${IP}:3000/dashboard/email`,
+            await axios.put(`${API_BASE}/dashboard/email`,
                 { email: emailInput },
                 { headers: { Authorization: token } }
             )
             setSuccess("Email updated successfully")
             setEmailInput("")
-            const response = await axios.get(`http://${IP}:3000/dashboard`, {
+            const response = await axios.get(`${API_BASE}/dashboard`, {
                 headers: { Authorization: token }
             })
             setUser(response.data.user)
@@ -134,7 +134,7 @@ export function AccountPage() {
 
         try {
             const token = localStorage.getItem("token")
-            await axios.put(`http://${IP}:3000/dashboard/password`,
+            await axios.put(`${API_BASE}/dashboard/password`,
                 { currentPassword: passwordInfo.current, newPassword: passwordInfo.new },
                 { headers: { Authorization: token } }
             )
@@ -157,7 +157,7 @@ export function AccountPage() {
 
         try {
             const token = localStorage.getItem("token")
-            await axios.delete(`http://${IP}:3000/dashboard/delete-paired-device`, {
+            await axios.delete(`${API_BASE}/dashboard/delete-paired-device`, {
                 headers: { Authorization: token }
             })
             navigate("/dashboard/pair")
