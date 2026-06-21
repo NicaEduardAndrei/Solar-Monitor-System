@@ -1,9 +1,9 @@
-import { events } from "./websocket.js"
+import { aggregatorEvents } from "./websocket.js"
 import prisma from "../prismaClient.js"
 
-const FLUSH_INTERVAL = 5 * 60 * 1000
-const RELOAD_DEVICES_INTERVAL = 5 * 60 * 1000
-const SENSOR_FIELDS = [
+const flushInterval = 5 * 60 * 1000
+const reloadDevInterval = 5 * 60 * 1000
+const sensorData = [
     'solarV', 'solarA', 'solarW',
     'gridV', 'gridA', 'gridW',
     'battV', 'battA', 'battW', 'battTemp',
@@ -12,30 +12,32 @@ const SENSOR_FIELDS = [
     'externalV', 'externalA', 'externalW'
 ]
 
-const LATEST_FIELDS = ['battState', 'relay1', 'relay2', 'relay3', 'relay4']
+const staticData = ['battState', 'relay1', 'relay2', 'relay3', 'relay4']
 
-const state = new Map()
+const tempData = new Map()
 let allDeviceIds = []
 
+
+
+
 async function loadDevicesFromDB() {
-    try {
-        const devices = await prisma.device.findMany({ select: { deviceId: true } })
-        allDeviceIds = devices.map(d => d.deviceId)
-        console.log(`[Aggregator] Loaded ${allDeviceIds.length} device(s) from DB`)
-    } catch (err) {
-        console.error('[Aggregator] Error loading devices from DB:', err.message)
-    }
+    const devices = await prisma.device.findMany({ select: { deviceId: true } })
+    allDeviceIds = devices.map(device => device.deviceId)
+    console.log(`[Aggregator] Loaded ${allDeviceIds.length} devices from DB`)
 }
 
 
+
+
+
 function processTelemetry(deviceId, data) {
-    if (!state.has(deviceId)) {
-        state.set(deviceId, {})
+    if (!tempData.has(deviceId)) {
+        tempData.set(deviceId, {})
     }
 
-    const deviceData = state.get(deviceId)
+    const deviceData = tempData.get(deviceId)
 
-    for (const field of SENSOR_FIELDS) {
+    for (const field of sensorData) {
         if (data[field] !== undefined && data[field] !== null) {
             const value = parseFloat(data[field])
             if (isNaN(value)) continue
@@ -45,13 +47,19 @@ function processTelemetry(deviceId, data) {
             } else {
                 deviceData[field].sum += value
                 deviceData[field].count++
-                if (value < deviceData[field].min) deviceData[field].min = value
-                if (value > deviceData[field].max) deviceData[field].max = value
+
+                if (value < deviceData[field].min) {
+                    deviceData[field].min = value
+                }
+                if (value > deviceData[field].max) {
+                    deviceData[field].max = value
+                }
             }
         }
     }
 
-    for (const field of LATEST_FIELDS) {
+
+    for (const field of staticData) {
         if (data[field] !== undefined) {
             deviceData[field] = data[field]
         }
@@ -59,29 +67,24 @@ function processTelemetry(deviceId, data) {
 }
 
 
-async function flushToDB() {
-    console.log(`[DEBUG] flushToDB called. allDeviceIds.length = ${allDeviceIds.length}, state.size = ${state.size}`)
-    if (allDeviceIds.length === 0) return
-
-    console.log(`Inserting ${allDeviceIds.length} ${allDeviceIds.length > 1 ? "devices" : "device"} to DB...`)
-
+async function sendToDB() {
     try {
         const readings = []
 
         for (const deviceId of allDeviceIds) {
-            const deviceData = state.get(deviceId) || {}
+            const deviceData = tempData.get(deviceId) || {}
             const reading = {
                 deviceId,
                 timestamp: new Date(Math.floor(Date.now() / 300000) * 300000)
             }
 
-            for (const field of SENSOR_FIELDS) {
-                const s = deviceData[field]
-                if (s && s.count > 0) {
-                    reading[field] = s.sum / s.count
-                    reading.readingCount = (reading.readingCount || 0) + s.count
-                    reading[`${field}Min`] = s.min
-                    reading[`${field}Max`] = s.max
+            for (const field of sensorData) {
+                const sensor = deviceData[field]
+                if (sensor && sensor.count > 0) {
+                    reading[field] = sensor.sum / sensor.count
+                    reading.readingCount = (reading.readingCount || 0) + sensor.count
+                    reading[`${field}Min`] = sensor.min
+                    reading[`${field}Max`] = sensor.max
                 } else {
                     reading[field] = 0
                     reading[`${field}Min`] = 0
@@ -93,7 +96,7 @@ async function flushToDB() {
                 reading.readingCount = 0
             }
 
-            for (const field of LATEST_FIELDS) {
+            for (const field of staticData) {
                 reading[field] = deviceData[field] !== undefined ? deviceData[field] : null
             }
 
@@ -101,22 +104,22 @@ async function flushToDB() {
         }
 
         const result = await prisma.sensorReading.createMany({ data: readings })
-        console.log(`[Aggregator] Saved ${result.count} reading(s) to DB`)
+        console.log(`[Aggregator] Sent ${allDeviceIds.length} devices with ${tempData.size} size to DB`)
 
-        state.clear()
+        tempData.clear()
 
     } catch (err) {
-        console.error('[Aggregator] Error flushing to DB:', err.message)
+        console.error('[Aggregator] Error sending to DB:', err.message)
     }
 }
 
-events.on('telemetry', ({ deviceId, data }) => {
+aggregatorEvents.on('telemetry', ({ deviceId, data }) => {
     processTelemetry(deviceId, data)
 })
 
     ; (async () => {
         await loadDevicesFromDB()
-        setInterval(flushToDB, FLUSH_INTERVAL)
-        setInterval(loadDevicesFromDB, RELOAD_DEVICES_INTERVAL)
-        console.log(`[Aggregator] Started. Flush interval: ${FLUSH_INTERVAL / 1000}s, Reload devices interval: ${RELOAD_DEVICES_INTERVAL / 1000}s`)
+        setInterval(sendToDB, flushInterval)
+        setInterval(loadDevicesFromDB, reloadDevInterval)
+        console.log(`[Aggregator] Started. Flush interval: ${flushInterval / 1000}s, Reload devices interval: ${reloadDevInterval / 1000}s`)
     })()

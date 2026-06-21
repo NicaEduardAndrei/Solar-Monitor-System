@@ -83,7 +83,7 @@ router.get("/charts/:category", async (req, res) => {
         const rangeMs = { "24h": 86400000, "7d": 604800000, "30d": 2592000000, "1y": 31536000000, "all": null }
         const startDate = rangeMs[range] ? new Date(Date.now() - rangeMs[range]) : undefined
 
-        const fieldMap = {
+        const sensorMap = {
             solar: { solarV: true, solarVMin: true, solarVMax: true, solarA: true, solarAMin: true, solarAMax: true, solarW: true, solarWMin: true, solarWMax: true },
             grid: { gridV: true, gridVMin: true, gridVMax: true, gridA: true, gridAMin: true, gridAMax: true, gridW: true, gridWMin: true, gridWMax: true },
             battery: { battV: true, battVMin: true, battVMax: true, battA: true, battAMin: true, battAMax: true, battW: true, battWMin: true, battWMax: true, battTemp: true, battTempMin: true, battTempMax: true, battSoc: true, battSocMin: true, battSocMax: true },
@@ -93,14 +93,14 @@ router.get("/charts/:category", async (req, res) => {
 
         const readings = await prisma[config.table].findMany({
             where: { deviceId, timestamp: startDate ? { gte: startDate } : undefined },
-            select: { timestamp: true, ...fieldMap[category] },
+            select: { timestamp: true, ...sensorMap[category] },
             orderBy: { timestamp: "asc" }
         })
 
         res.json({ data: readings })
     } catch (err) {
-        console.error("Error fetching chart data:", err)
-        res.status(500).json({ message: "Failed to fetch chart data" })
+        console.error("Error serving chart data:", err)
+        res.status(500).json({ message: "Failed to serv chart data" })
     }
 })
 
@@ -125,28 +125,21 @@ router.get("/energy-summary", async (req, res) => {
     const rangeMs = { "24h": 86400000, "7d": 604800000, "30d": 2592000000, "1y": 31536000000 }
     const startDate = rangeMs[range] ? new Date(Date.now() - rangeMs[range]) : undefined
 
-    const conditions = [
-        Prisma.sql`"deviceId" = ${deviceId}`,
-        Prisma.sql`"readingCount" >= 0`
-    ]
-    if (startDate) {
-        conditions.push(Prisma.sql`"timestamp" >= ${startDate}`)
-    }
-
     const result = await prisma.$queryRaw`
-        SELECT
-            COALESCE(SUM("solarW"), 0) * ${config.intervalHours} as "solarW",
-            COALESCE(SUM("gridW"), 0) * ${config.intervalHours} as "gridW",
-            COALESCE(SUM("internalW") + SUM("externalW"), 0) * ${config.intervalHours} as "consumedW"
-        FROM ${Prisma.raw(`"${config.table}"`)}
-        WHERE ${Prisma.join(conditions, ' AND ')}
+    SELECT
+        COALESCE(SUM("solarW"), 0) * ${config.intervalHours} AS "solarW",
+        COALESCE(SUM("gridW"), 0) * ${config.intervalHours} AS "gridW",
+        COALESCE(SUM("internalW") + SUM("externalW"), 0) * ${config.intervalHours} AS "consumedW"
+    FROM ${Prisma.raw(`"${config.table}"`)}
+    WHERE "deviceId" = ${deviceId}
+      AND "readingCount" >= 0
+      ${startDate ? Prisma.sql`AND "timestamp" >= ${startDate}` : Prisma.empty}
     `
 
-    const row = result[0]
     res.json({
-        solarW: +parseFloat(row.solarW).toFixed(2),
-        gridW: +parseFloat(row.gridW).toFixed(2),
-        consumedW: +parseFloat(row.consumedW).toFixed(2)
+        solarW: +parseFloat(result[0].solarW).toFixed(2),
+        gridW: +parseFloat(result[0].gridW).toFixed(2),
+        consumedW: +parseFloat(result[0].consumedW).toFixed(2)
     })
 })
 

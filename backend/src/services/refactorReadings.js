@@ -1,78 +1,90 @@
 import prisma from "../prismaClient.js"
 
-const SENSOR_FIELDS = [
-  'solarV', 'solarA', 'solarW',
-  'gridV', 'gridA', 'gridW',
-  'battV', 'battA', 'battW', 'battTemp',
-  'battSoc',
-  'internalV', 'internalA', 'internalW',
-  'externalV', 'externalA', 'externalW'
+const sensorData = [
+    'solarV', 'solarA', 'solarW',
+    'gridV', 'gridA', 'gridW',
+    'battV', 'battA', 'battW', 'battTemp',
+    'battSoc',
+    'internalV', 'internalA', 'internalW',
+    'externalV', 'externalA', 'externalW'
 ]
 
-const LATEST_FIELDS = ['battState', 'relay1', 'relay2', 'relay3', 'relay4']
+const staticData = ['battState', 'relay1', 'relay2', 'relay3', 'relay4']
 
 
-const floor = {
-  hour: d => new Date(new Date(d).setUTCMinutes(0, 0, 0)),
-  day: d => new Date(new Date(d).setUTCHours(0, 0, 0, 0)),
-  week: d => {
-    const x = new Date(new Date(d).setUTCHours(0, 0, 0, 0))
-    const dow = x.getUTCDay() || 7
-    x.setUTCDate(x.getUTCDate() - dow + 1)
-    return x
-  }
+const roundTimestampsForDB = {
+    hour: d => new Date(new Date(d).setUTCMinutes(0, 0, 0)),
+    day: d => new Date(new Date(d).setUTCHours(0, 0, 0, 0)),
+    week: d => {
+        const dayStart = new Date(new Date(d).setUTCHours(0, 0, 0, 0))
+        const dayOfWeek = dayStart.getUTCDay() || 7
+        dayStart.setUTCDate(dayStart.getUTCDate() - dayOfWeek + 1)
+        return dayStart
+    },
+    fiveMinute: d => new Date(Math.floor(new Date(d).getTime() / 300000) * 300000)
 }
 
-const floor5 = d => new Date(Math.floor(new Date(d).getTime() / 300000) * 300000)
-
-const sqlTs = d => d.toISOString().replace('T', ' ').replace('Z', '')
-
-function avgFields() {
-  return SENSOR_FIELDS.map(f => `AVG("${f}") as "${f}"`).join(",")
+const unitToMS = {
+    hour: 3600000,
+    day: 86400000,
+    week: 604800000
 }
 
-function minFields() {
-  return SENSOR_FIELDS.map(f => `MIN("${f}Min") as "${f}Min"`).join(",")
+const convertTimestampForDB = d => d.toISOString().replace('T', ' ').replace('Z', '')
+
+function avgSensorValue() {
+    return sensorData.map(f => `AVG("${f}") as "${f}"`).join(",")
 }
 
-function maxFields() {
-  return SENSOR_FIELDS.map(f => `MAX("${f}Max") as "${f}Max"`).join(",")
+function minSensorValue() {
+    return sensorData.map(f => `MIN("${f}Min") as "${f}Min"`).join(",")
 }
 
-function latestFields() {
-  return LATEST_FIELDS.map(f =>
-    `(ARRAY_AGG("${f}" ORDER BY "timestamp" DESC))[1] as "${f}"`
-  ).join(",")
+function maxSensorValue() {
+    return sensorData.map(f => `MAX("${f}Max") as "${f}Max"`).join(",")
+}
+
+function lastStaticValue() {
+    return staticData.map(f =>
+        `(ARRAY_AGG("${f}" ORDER BY "timestamp" DESC))[1] as "${f}"`
+    ).join(",")
 }
 
 
-async function aggregate(deviceId, { source, dest, unit, intervalMs }) {
-  const last = await prisma[dest].findFirst({
-    where: { deviceId, readingCount: { gte: 0 } },
-    orderBy: { timestamp: 'desc' }
-  })
+async function refactor(deviceId, { source, dest, unit }) {
+    const last = await prisma[dest].findFirst({
+        where: { deviceId, readingCount: { gte: 0 } },
+        orderBy: { timestamp: 'desc' }
+    })
 
-  const from = last
-    ? new Date(last.timestamp.getTime() + intervalMs)
-    : new Date(0)
+    let from
+    if (last) {
+        from = new Date(last.timestamp.getTime() + unitToMS[unit])
+    } else {
+        from = new Date(0)
+    }
 
-  const to = floor[unit](new Date())
+    const to = roundTimestampsForDB[unit](new Date())
 
-  if (from >= to) return
+    if (from >= to) return
 
-  const trunc =
-    unit === 'hour' ? "date_trunc('hour', \"timestamp\")" :
-      unit === 'day' ? "date_trunc('day', \"timestamp\")" :
-        "date_trunc('week', \"timestamp\")"
+    let trunc
+    if (unit === 'hour') {
+        trunc = "date_trunc('hour', \"timestamp\")"
+    } else if (unit === 'day') {
+        trunc = "date_trunc('day', \"timestamp\")"
+    } else {
+        trunc = "date_trunc('week', \"timestamp\")"
+    }
 
-  const rows = await prisma.$queryRawUnsafe(`
+    const rows = await prisma.$queryRawUnsafe(`
     SELECT
       ${trunc} as ts,
       COUNT(*) as "readingCount",
-      ${avgFields()},
-      ${minFields()},
-      ${maxFields()},
-      ${latestFields()}
+      ${avgSensorValue()},
+      ${minSensorValue()},
+      ${maxSensorValue()},
+      ${lastStaticValue()}
     FROM "${source}"
     WHERE "deviceId"='${deviceId}'
       AND "readingCount" >= 0
@@ -82,30 +94,43 @@ async function aggregate(deviceId, { source, dest, unit, intervalMs }) {
     ORDER BY ts
   `)
 
-  if (!rows.length) return
+    if (!rows.length) return
 
-  await prisma[dest].createMany({
-    data: rows.map(r => ({
-      deviceId,
-      timestamp: r.ts,
-      readingCount: Number(r.readingCount),
-      ...Object.fromEntries(SENSOR_FIELDS.map(f => [f, r[f]])),
-      ...Object.fromEntries(SENSOR_FIELDS.map(f => [`${f}Min`, r[`${f}Min`]])),
-      ...Object.fromEntries(SENSOR_FIELDS.map(f => [`${f}Max`, r[`${f}Max`]])),
-      ...Object.fromEntries(LATEST_FIELDS.map(f => [f, r[f]]))
-    })),
-    skipDuplicates: true
-  })
+
+
+    const readings = []
+
+    for (const r of rows) {
+        const reading = {
+            deviceId,
+            timestamp: r.ts,
+            readingCount: Number(r.readingCount)
+        }
+        for (const senzor of sensorData) {
+            reading[senzor] = r[senzor]
+            reading[senzor + 'Min'] = r[senzor + 'Min']
+            reading[senzor + 'Max'] = r[senzor + 'Max']
+        }
+        for (const staticSenzor of staticData) {
+            reading[staticSenzor] = r[staticSenzor]
+        }
+        readings.push(reading)
+    }
+    await prisma[dest].createMany({
+        data: readings,
+        skipDuplicates: true
+    })
+
 }
 
 
 async function fillGaps(deviceId, table, interval, until) {
-  await prisma.$executeRawUnsafe(`
+    await prisma.$executeRawUnsafe(`
     INSERT INTO "${table}" ("deviceId","timestamp","readingCount")
     SELECT '${deviceId}', slot, -1
     FROM generate_series(
       (SELECT MIN("timestamp") FROM "${table}" WHERE "deviceId"='${deviceId}'),
-      '${sqlTs(until)}'::timestamp,
+      '${convertTimestampForDB(until)}'::timestamp,
       '${interval}'::interval
     ) slot
     WHERE NOT EXISTS (
@@ -118,86 +143,89 @@ async function fillGaps(deviceId, table, interval, until) {
 
 
 
-async function purge(deviceId, table, days) {
-  await prisma[table].deleteMany({
-    where: {
-      deviceId,
-      timestamp: {
-        lt: new Date(Date.now() - days * 86400000)
-      }
-    }
-  })
+async function deleteExtraData(deviceId, table, days) {
+    await prisma[table].deleteMany({
+        where: {
+            deviceId,
+            timestamp: {
+                lt: new Date(Date.now() - days * 86400000)
+            }
+        }
+    })
 }
 
 
 
 async function loadDevices() {
-  const devices = await prisma.device.findMany({ select: { deviceId: true } })
-  return devices.map(d => d.deviceId)
+    const devices = await prisma.device.findMany({ select: { deviceId: true } })
+    return devices.map(d => d.deviceId)
 }
 
 
 async function main() {
-  const deviceIds = await loadDevices()
-  if (!deviceIds.length) {
-    console.log("[Refactor] No devices found, skipping")
-    return
-  }
+    const totalStart = Date.now()
+    const deviceIds = await loadDevices()
+    if (!deviceIds.length) {
+        return
+    }
 
-  console.log(`=== REFACTOR START (${deviceIds.length} device(s)) ===`)
+    console.log(`=== REFACTOR START (${deviceIds.length} device(s)) ===`)
 
-  const now = new Date()
+    const now = new Date()
 
-  for (const deviceId of deviceIds) {
-    console.log(`[Refactor] Processing ${deviceId}`)
+    for (const deviceId of deviceIds) {
+        console.log(`[Refactor] Processing ${deviceId}`)
+        const deviceStart = Date.now()
 
-    // 5min → hourly
-    await aggregate(deviceId, {
-      source: "SensorReading",
-      dest: "sensorReadingHourly",
-      unit: "hour",
-      intervalMs: 3600000
-    })
+        
+        await refactor(deviceId, {
+            source: "SensorReading",
+            dest: "sensorReadingHourly",
+            unit: "hour"
+        })
 
-    await fillGaps(deviceId, "SensorReadingHourly", "1 hour",
-      new Date(floor.hour(now).getTime() - 3600000))
+        await fillGaps(deviceId, "SensorReadingHourly", "1 hour",
+            new Date(roundTimestampsForDB.hour(now).getTime() - 3600000))
 
-    // hourly → daily
-    await aggregate(deviceId, {
-      source: "SensorReadingHourly",
-      dest: "sensorReadingDaily",
-      unit: "day",
-      intervalMs: 86400000
-    })
+        
+        await refactor(deviceId, {
+            source: "SensorReadingHourly",
+            dest: "sensorReadingDaily",
+            unit: "day"
+        })
 
-    await fillGaps(deviceId, "SensorReadingDaily", "1 day",
-      new Date(floor.day(now).getTime() - 86400000))
+        await fillGaps(deviceId, "SensorReadingDaily", "1 day",
+            new Date(roundTimestampsForDB.day(now).getTime() - 86400000))
 
-    // daily → weekly
-    await aggregate(deviceId, {
-      source: "SensorReadingDaily",
-      dest: "sensorReadingWeekly",
-      unit: "week",
-      intervalMs: 7 * 86400000
-    })
+        
+        await refactor(deviceId, {
+            source: "SensorReadingDaily",
+            dest: "sensorReadingWeekly",
+            unit: "week"
+        })
 
-    await fillGaps(deviceId, "SensorReadingWeekly", "1 week",
-      new Date(floor.week(now).getTime() - 7 * 86400000))
+        await fillGaps(deviceId, "SensorReadingWeekly", "1 week",
+            new Date(roundTimestampsForDB.week(now).getTime() - 7 * 86400000))
 
-    // raw gaps
-    await fillGaps(deviceId, "SensorReading", "5 minutes",
-      new Date(floor5(now).getTime() - 300000))
+        
+        await fillGaps(deviceId, "SensorReading", "5 minutes",
+            new Date(roundTimestampsForDB.fiveMinute(now).getTime() - 300000))
 
-    // retention
-    await purge(deviceId, "sensorReading", 7)
-    await purge(deviceId, "sensorReadingHourly", 30)
-    await purge(deviceId, "sensorReadingDaily", 365)
-  }
+        
+        await deleteExtraData(deviceId, "sensorReading", 7)
+        await deleteExtraData(deviceId, "sensorReadingHourly", 30)
+        await deleteExtraData(deviceId, "sensorReadingDaily", 365)
 
-  console.log("=== DONE ===")
+
+        const deviceDuration = ((Date.now() - deviceStart) / 1000).toFixed(2)
+        console.log(`[Refactor] Done processing ${deviceId} in ${deviceDuration}s`)
+    }
+
+    const totalDuration = ((Date.now() - totalStart) / 1000).toFixed(2)
+    console.log(`=== DONE in ${totalDuration}s ===`)
 }
 
-const INTERVAL = 5 * 60 * 1000
+const flushInterval = 60 * 60 * 1000
 
 main().catch(console.error)
-setInterval(() => main().catch(console.error), INTERVAL)
+setInterval(() => main().catch(console.error), flushInterval)

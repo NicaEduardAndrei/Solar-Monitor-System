@@ -1,0 +1,208 @@
+
+
+1. INTRODUCERE
+1.1. MOTIVAȚIA ALEGERII TEMEI
+Factorul determinant în alegerea acestei teme a fost interesul meu pentru sistemele de energie regenerabilă. În vremea noastră, energia solară este o componentă esențială a infrastructurii energetice moderne, fiind prioritară în sectorul rezidențial cât și în cel industrial.
+Motivația personală provine din experiența obținută în timp cu sistemele fotovoltaice, deținând și utilizând diverse sisteme de energie solară, de la cele pentru locuință până la soluții integrate de putere mică, precum iluminat solar de exterior și proiectoare solare. În afara utilizării proprii, un alt factor important este participarea activă la proiectarea, construirea și vizualizarea modului lor de lucru, de la hardware până la software, alături de tatăl meu.
+În cadrul acestor experiențe am realizat că majoritatea sistemelor comerciale, chiar și cele realizate manual piesă cu piesă, vin însoțite de soluții software integrate. Astfel, un utilizator care deține un asemenea sistem este de regulă obligat să utilizeze platforma specifică producătorului respectiv, ceea ce face ca un sistem de o complexitate mai mică, care nu are un asemenea software, să nu poată avea o platformă de monitorizare și control de la distanță.
+1.2. OBIECTIVELE LUCRĂRII DE LICENȚĂ
+Această lucrare își propune să ofere o platformă web generică, independentă de hardware, capabilă să primească date de la orice dispozitiv IoT care respectă structura și protocolul de comunicație standardizat, astfel încât orice utilizator, chiar dacă are experiență în dezvoltarea aplicațiilor software web sau nu, poate avea acces la una, putând să își integreze în ecosistemul platformei sistemul lui, beneficiind de funcționalitățile de monitorizare în timp real, stocare pe termen lung și control de la distanță.
+Obiectivele tehnice specifice aplicației includ monitorizarea datelor în timp real primite de la dispozitivele IoT, asigurând vizualizarea valorilor sistemului prin intermediul diagramei interactive; stocarea datelor pe termen nedeterminat folosind un sistem de agregare multi-nivel care optimizează spațiul utilizat de date, refactorizându-le automat de la rezoluția inițială de date salvate odată la 5 minute la date agregate la o oră, o zi, o săptămână, păstrând rezoluția specifică pentru perioada de timp afișată: de exemplu, date odată la 5 minute pentru ultimele 7 zile, date odată la o oră pentru ultimele 30 zile, date odată la o zi pentru ultimul an și date odată la o săptămână pentru toată perioada existentă; și controlul de la distanță al dispozitivelor conectate, ceea ce permite utilizatorului controlul hardware prin intermediul aceleiași conexiuni WebSocket bidirecționale.
+Din punct de vedere academic, această lucrare demonstrează integrarea între hardware și software, ilustrând modul în care o arhitectură software proiectată special poate abstractiza complexitatea dispozitivelor embedded și oferă o soluție unificată pentru orice sistem IoT compatibil.
+Obiectivele de performanță includ transmiterea și vizualizarea datelor cu o latență cât mai mică pentru o experiență de flux în timp real, disponibilitatea utilizatorului de a intra pe platforma publică prin domeniul dedicat accesibil de pe orice dispozitiv conectat la internet, simplitatea interfeței și explicarea totală a funcțiilor prin intermediul unui manual digital aflat pe website și valabilitatea într-un timp rapid a istoricului care este pe o durată nelimitată.
+1.3. STRUCTURA LUCRĂRII
+Lucrarea este structurată în șase capitole care explică în ordine procesul de dezvoltare al sistemului IoT, de la partea teoretică până la partea de implementare și evaluare.
+Capitolul 1 arată tema lucrării și motivația alegerii acesteia, precum și obiectivele urmărite.
+Capitolul 2 prezintă stadiul actual prin care sistemele de energie solară de pe piață preiau, procesează și arată datele, dar și modul actual general de optimizare a poziției panourilor.
+Capitolul 3 detaliază conceptele teoretice, fundamentale și tehnologiile utilizate, de la platforma hardware cu senzori și microcontroller, până la protocoalele de comunicație și tehnologiile backend și frontend.
+Capitolul 4 descrie partea de implementare și dezvoltare a aplicației software, cât și partea conceptuală cu exemplu de hardware care ar funcționa cu sistemul IoT de monitorizare și control, dar și testarea și validarea soluției.
+Capitolul 5 explică contribuțiile personale, interpretarea rezultatelor și evaluarea performanțelor sistemului.
+Capitolul 6 prezintă concluziile lucrării prin evaluarea realizărilor obiectivelor propuse, avantajele și limitările sistemului, experiența dezvoltării, dar și dezvoltările și planul proiectului pentru viitor.
+2. STADIUL ACTUAL AL CUNOAȘTERII ÎN DOMENIUL TEMEI LUCRĂRII
+2.1. SISTEME COMERCIALE DE MONITORIZARE A ENERGIEI SOLARE
+Monitorizarea sistemelor fotovoltaice a devenit esențială și tot mai populară odată cu creșterea nevoii de energie electrică. În principal, cererea a fost accentuată din cauza tranzițiilor multor consumatori de energie mecanică și termică, precum centralele pe gaz, aragazele, automobilele cu motor cu combustie internă, bicicletele sau trotinetele, către alternative populare alimentate electric.
+În era noastră, pentru a oferi utilizatorului control total, invertoarele inteligente sunt prevăzute cu o modalitate de monitorizare și control implementată fie sub formă de site web, fie ca aplicație mobilă. Pentru a putea înțelege stadiul actual al soluțiilor disponibile, chiar dacă sistemele nu dețin funcția de a adăuga un dispozitiv separat, ci doar funcția de a adăuga un dispozitiv testat și produs de ei, au fost testate și analizate trei aplicații comerciale întâlnite în sisteme reale: Deye, Hy-Power (PowMr) și Victron. Toate aceste trei aplicații au fost testate și analizate personal, având fiecare câte o instalație de panouri fotovoltaice construită în scop rezidențial sau în scop industrial.
+ 
+Figura 2.1: Interfața aplicației Deye: (a) ecranul principal cu schema de vizualizare a fluxului energetic; (b) secțiunea de analiză a datelor și calcule; (c) vizualizarea graficelor pe diferite perioade de timp; (d) informații despre dispozitiv și parametrii de funcționare (sursa : autor , captură din aplicația Deye)
+Aplicația Deye oferă un meniu cu 3 ecrane: unul pentru vizualizare generală, unul pentru date și unul pentru dispozitiv. Pe ecranul principal se poate observa o schemă pentru vizualizarea fluxului energetic în timp real, locația, vremea și producția totală în ziua respectivă (Figura 2.1a). În partea de jos a primului ecran avem un grafic general care ne arată multe informații înregistrate în ultimele 24 de ore, iar sub acesta o diagramă circulară care ne împarte în procente consumul și producția sistemului (Figura 2.1b). În ecranul pentru date, aplicația dispune de grafice cu informații și date diverse pe durate diferite de timp selectabile (Figura 2.1c). Ultimul ecran este cel ce ne arată datele dispozitivului conectat, precum numele, numărul de identificare al dispozitivului care este blurat pentru protecția datelor, o scurtă afișare a energiei produse de panoul solar în momentul curent, energia produsă de panou în ultima zi și energia cumulată de când dispozitivul a fost pus în funcțiune (Figura 2.1d).
+ 
+Figura 2.2: Interfața aplicației Hy-Power: (a) ecranul de autentificare; (b) informații despre dispozitiv; (c) ecranul principal cu schema de vizualizare a fluxului energetic; (d) vizualizarea grafică a datelor pe o perioadă de timp; (e) vizualizarea grafică detaliată a datelor pe o perioadă de timp , analiza datelor și statistici (sursa : autor , captură din aplicația Hy-Power)
+
+Aplicația Hy-Power prezintă un sistem similar, pornind de la o autentificare simplă unde ne este cerut numele de utilizator și parola (Figura 2.2a), apoi avem opțiunea de a selecta unul dintre dispozitivele conectate cu contul nostru pentru a merge mai departe (Figura 2.2b). În ecranul principal ne este oferit numele dispozitivului pus de către utilizator și clasica schemă de vizualizare a fluxului energetic, dar și o etichetă unde ne este arătat modul de lucru al invertorului, dacă are energie, versiunea de software și voltajul invertorului (Figura 2.2c). În al doilea ecran ne este oferit un grafic simplu cu 3 date din ziua curentă, fără un mod ușor de a schimba rezoluția timpului, putând să schimbăm rezoluția timpului apăsând pe iconița din dreapta sus de setări (Figura 2.2d). Al treilea ecran ne arată un grafic și o diagramă circulară cu date pe perioada de timp selectată din partea superioară a ecranului (Figura 2.2e).
+ 
+Figura 2.3: Interfața aplicației Victron: (a) ecranul principal cu schema de vizualizare a fluxului energetic; (b) analiza datelor și statistici; (c) vizualizarea grafică a datelor pe o perioadă de timp; (d) panoul de control cu afișarea notificarilor (sursa : autor , captură din aplicația Victron)
+Aplicația Victron are pe ecranul principal numele dispozitivului setat de utilizator, informații cu privire la ultima actualizare a datelor afișate, starea și ora locală împreună cu schema de vizualizare a fluxului energetic (Figura 2.3a). Dacă ne mutăm în partea de jos a paginii, putem vedea un grafic cu date de la ultima zi și un calcul format din consumul din rețea și injectarea în rețea (Figura 2.3b). În al doilea ecran avem o funcționalitate de consolă unde ne apare un meniu de notificări și un sistem de navigație cu butoane tip consolă unde putem vedea informații ca, de exemplu, erori (Figura 2.3d). Al treilea ecran ne arată grafice cu date pe perioade de timp selectabile, statistici și analize (Figura 2.3c).
+Astfel, pe baza celor prezentate anterior, s-au identificat următoarele similarități între sistemele de monitorizare și control de pe piață. Aplicațiile prezintă un sistem de autentificare cu dispozitiv înregistrat pe contul respectiv, o schemă de vizualizare a fluxului energetic cu date de la hardware, precum: panouri solare, baterie, sarcină etc., grafice cu istoric pe perioade de la o zi până la lună sau an, calcul automat al producției și al consumului total și o secțiune dedicată pentru informații despre dispozitivul conectat.
+Toate aplicațiile analizate au funcționalități similare de monitorizare, dar cu control de la distanță redus. Soluțiile sunt concepute să funcționeze doar cu dispozitivele produse de către compania lor specifică.
+2.2. TEHNICI DE URMĂRIRE A POZIȚIEI SOLARE
+2.2.1. Importanța urmăririi solare
+Sistemele de urmărire solară au ca scop orientarea panourilor fotovoltaice către soare, astfel permițând acestuia să capteze mult mai multă radiație solară. Un sistem de acest tip mișcă panourile relativ cu soarele în scopul de a maximiza captarea de radiații solare. Importanța urmăririi solare este determinată de faptul că energia produsă de un panou fotovoltaic este mult mai ridicată cu cât poziția lui reușește să fie cât mai perpendiculară față de razele soarelui în orice moment al zilei [1], [2].
+Sistemele fotovoltaice fixe, comparativ cu cele de urmărire solară, au o pierdere cauzată de poziționarea nefavorabilă a panourilor, neavând un mecanism prin care urmărește poziția soarelui de-a lungul zilei (Singh & Pachauri, 2018). În literatura analizată sunt menționate creșteri ale eficienței energiei produse cu aproximativ 10-25% față de sistemele fixe, iar unele studii experimentale au raportat îmbunătățiri ale puterii generate cu până la 30-45% în funcție de condițiile meteo, locația amplasării panoului și tipul sistemului [3], [2], [4].
+2.2.2 Metode de urmărire solară
+O primă clasificare a sistemelor de urmărire solară se realizează în funcție de numărul de axe de mișcare. Cele două tipuri de sisteme, în funcție de numărul de axe, sunt sisteme pe un singur ax și sistemele pe două axe. Sistemele cu un singur ax permit orientarea panoului pe o singură axă/direcție și sunt în general mult mai simple din punct de vedere al construcției, având de regulă doar un singur motor care, în funcție de configurație, are o rotație pe orizontală, verticală sau oblică. Aceste sisteme pot reprezenta o soluție destul de bună pentru sisteme de dimensiune redusă, unde se urmărește o complexitate cât mai mică și niște costuri cât mai reduse [5], [1], [6].
+Sistemele cu două axe fac ca orientarea panoului în direcția exact dorită să fie mult mai accesibilă din cauza direcției pe două axe ce oferă o libertate mai mare de mișcare și o acuratețe mare pe parcursul zilei. Prin această configurație, panoul poate să fie ținut mult mai aproape de poziția perpendiculară față de radiația solară, crescând energia obținută. Singurul dezavantaj al acestor sisteme este gradul de complexitate ridicat, acesta fiind dat de necesitatea a două motoare și costul aferent mai ridicat de întreținere în comparație cu cele fixe sau cu cele cu un singur ax [5], [6], [2].
+Din punct de vedere al tehnologiei de acționare și control, sistemele de urmărire solară pot fi active, pasive, semi-pasive, manuale sau cronologice. Sistemele active utilizează senzori și motoare pentru a afla unghiul de perpendicularitate către soare, în timp ce sistemele pasive se bazează pe fenomene fizice ca dilatarea termică sau dezechilibrul de presiune (Mostakim & Hasanuzzaman, 2022; Hafez & Harag, 2018). În funcție de strategia de control, există și sisteme care calculează poziția soarelui pe baza traiectoriei acestuia sau sisteme care folosesc senzori precum detectarea poziției reale a soarelui. De asemenea, metodele foarte moderne pot folosi chiar și algoritmi astronomici, senzori LDR, procesare de imagini sau tehnici inteligente precum rețele neuronale, logică fuzzy  și algoritmi genetici  [5], [1], [7].
+3. CONCEPTE, FUNDAMENTE TEORETICE ȘI TEHNOLOGII UTILIZATE
+3.1 FUNDAMENTE TEORETICE ȘI ARHITECTURA SISTEMULUI
+Internet of Things (IoT) reprezintă o arhitectură de sistem distribuit care interconectează dispozitive hardware echipate cu senzori, software și capacități de comunicație, care transmit și colectează datele respective. Arhitecturi IoT tipice au un model compus din mai multe straturi: stratul de percepție compus din senzori și actuatoare, stratul de rețea care este compus din protocoale de comunicație și gateway-uri pentru comunicație, stratul de procesare ce includ serverele și serviciile cloud și stratul de aplicație ce include partea de interfață pentru utilizator [8]. Sistemul dezvoltat în această lucrare urmează această arhitectură și separă componenta hardware de cea software, ceea ce permite integrarea microcontrollerelor compatibile indiferent de producător sau specificații.
+Modelul server-client și arhitectura REST (Representational State Transfer) reprezintă baza operațiilor CRUD (Create, Read, Update, Delete) în aplicațiile web moderne. REST, definit de [9] este o arhitectură stateless în care serverul nu păstrează o stare între cereri, practic fiecare cerere este complet independentă de celelalte și nu păstrează nicio informație anterioară. Resursele sunt identificate prin URL-urile specifice lor, iar operațiile asupra acestora sunt metode HTTP (GET, POST, PUT, DELETE). Această abordare ne ajută la scalabilitate, simplitate și funcționarea dintre sisteme complet diferite care utilizează același protocol de comunicare.
+Pentru aplicațiile de monitorizare în timp real, modelul cerere-răspuns al HTTP prezintă limitări, deoarece pentru un sistem care are nevoie de actualizări de date constant ar trebui să facă de fiecare dată câte o cerere pentru a primi un răspuns, ceea ce introduce întârzieri, cereri repetate și operații redundante. Protocolul WebSocket, standardizat prin RFC 6455 [10], rezolvă această problemă printr-o conexiune full-duplex între client și server, permițând transmiterea datelor fără modelul clasic de cerere și răspuns oferit de HTTP. Această caracteristică este foarte importantă pentru sistemele de monitorizare care necesită actualizări în timp real la un interval de timp, dar și pentru sistemele de control care vor să trimită o comandă către dispozitiv fără ca acesta să facă o cerere pentru ea.
+Arhitectura generală a sistemului propus este prezentată în Figura 3.1. Sistemul are trei componente: baza de date PostgreSQL, backend-ul Node.js cu Express.js, frontend-ul React și dispozitivele IoT care se conectează la backend printr-o conexiune WebSocket, având un schimb de date și comenzi.
+
+ 
+Figura 3.1 Diagrama bloc a arthitecturii sistemului
+
+Fluxul principal de date este constituit prin trimiterea de date de către dispozitiv în format JSON [11] către backend odată la o secundă prin intermediul WebSocket-ului, ulterior backend-ul direcționează datele respective în două părți. În prima parte backend-ul pasează direct conexiunea către frontend pentru afișarea lor unde este nevoie de afișarea sau verificarea datelor în timp real doar utilizatorilor cu un dispozitiv împerecheat. În a doua parte tot același flux de date este preluat de către un agregator care odată la 5 minute scrie în PostgreSQL media, minimul și maximul pentru fiecare intrare. Intrările agregate odată la 5 minute sunt apoi refactorizate de alt proces din backend pe perioadele de timp necesare afișării lor în grafice și tabele, totodată optimizând drastic consumul de spațiu prin eliminarea tuturor valorilor ce trec de pragul respectiv de timp. Ultima componentă a fluxului de comunicare este interacțiunea inversă în care frontend-ul trimite comenzile către backend prin WebSocket, acesta redirecționându-le ulterior către dispozitiv.
+3.2 TEHNOLOGII BACKEND
+Node.js este un runtime  JavaScript ce se bazează pe motorul V8  din Chrome, caracterizat prin modelul său non-blocant și arhitectura pe bază de evenimente, fiind bun pentru aplicații cu multe operații și conexiuni simultane [12]. Express este unul din framework-urile web minimaliste pentru Node.js ce facilitează implementarea de rute REST prin gestionarea rutelor, middleware-urilor  și a cererilor HTTP [13]. În sistemul propus sunt gestionate de către Express rutele pentru autentificare (/api/auth), dashboard (/api/dashboard) și înregistrarea dispozitivelor (/api/device). Acesta, în plus, servește și fișierele din frontend pentru livrarea aplicației din același server, acesta fiind expus public prin Cloudflare Tunnel .
+PostgreSQL este un sistem de gestionare a bazelor de date relaționale cu sursă deschisă, renumit pentru stabilitatea, extensibilitatea și performanța sa, inclusiv pentru date precise decimale și posibilitatea de a crea tipuri de date noi etc. [14]. Prisma este un ORM  (Object-Relational Mapping) nou făcut special pentru TypeScript și Node.js care oferă: interogări sigure deoarece știe exact ce tip de date are fiecare coloană din baza de date și nu poți face greșeli; istoric de migrări automat și o schemă declarativă ușor de întreținut unde declari practic cum arată baza de date [15]. Baza de date are șase tabele: User (utilizatori), Device (dispozitive înregistrate), SensorReading (date agregate la intervale de 5 minute direct de la dispozitiv), SensorReadingHourly (date agregate în intervale de o oră), SensorReadingDaily (date agregate în intervale de o zi), SensorReadingWeekly (date agregate în intervale de o săptămână). Tabelele referitoare la senzori stochează date de la șapte categorii de senzori: producție solară, baterie, rețea electrică, sarcină externă, sarcină internă cu valori medii, minime și maxime pe intervalele prezentate anterior. După procesul de refactorizare retenția de date pentru fiecare tabel este: 7 zile pentru date agregate la 5 minute, 30 zile pentru agregările orare, un an pentru datele agregate zilnic și nelimitat pentru date agregate săptămânal. Practic prin acest proces de refactorizare ce rulează odată la o oră și agregă multi-nivel respectiv mută datele respective din tabelul cu date brute odată la 5 minute în restul tabelelor pe perioadele corespunzătoare de timp și umple datele lipsă pentru a simplifica afișarea lor în grafice.
+Autentificarea se realizează prin două metode, una fiind pentru contul utilizatorului și una pentru înregistrarea dispozitivelor la backend. Autentificarea utilizatorilor se face folosind JWT (JSON Web Token), un standard simplu și eficient pentru reprezentarea securizată a informațiilor între părți [16]. Token-ul JWT conține cheia utilizatorului, este semnat cu un secret și are o durată de expirare care poate fi aleasă, în cazul meu fiind de o zi și pentru înregistrare și pentru autentificare. Dispozitivele folosesc HMAC-SHA256 (Hash-Based Message Authentication Code), un mecanism de autentificare bazat tot pe un secret care trebuie să fie deținut și de dispozitiv și de server pentru a fi criptat și decriptat [17].
+Această separare în autentificare a fost făcută din cauza faptului că dispozitivul este gândit ca un client al aplicației, deci înainte de a avea acces la înregistrare care îi deblochează posibilitatea de a trimite date către păstrare și gestionare este considerat ca ar fi trebuit să primească secretul pentru criptarea unui identificator cu HMAC-SHA256 de la dezvoltator. În schimb utilizatorul nu are nevoie de un secret pentru a-și face un cont deci utilizarea JWT a fost mult mai bună pentru acest scenariu. Fiecare cerere a utilizatorului sau a dispozitivului trece prin middleware-ul corespunzător cererii și în cazul în care nu se poate verifica autenticitatea token-ului utilizatorului sau decriptarea secretului dispozitivului cererea este respinsă.
+3.3 TEHNOLOGII FRONTEND
+React este o bibliotecă JavaScript pentru interfețe web bazată pe componente și pe o paradigmă declarativă în care interfața este descrisă în funcție de starea aplicației. React utilizează un DOM virtual, o copie a DOM-ului real și face actualizarea lui doar unde au fost bucăți modificate ceea ce face aplicația mult mai rapidă mai ales pentru sistemul de monitorizare și control de energie solară unde avem componente care se actualizează individual [18]. Vite este un build tool de generație nouă care implică un server pentru dezvoltare cu actualizări extrem de rapide prin native ES modules  și Hot Module Replacement (HMR) ce permite actualizarea codului din browser instant fără a necesita reîncărcarea paginii [19]. În sistemul propus, frontend-ul este React (SPA) construită cu Vite și utilizează React Router pentru a face posibilă navigarea între pagini de tip mobil adică o aplicație cu o fereastră care se actualizează cu noua pagină în funcție de meniul selectat fără a reîncărca cu totul pagina părinte [20]. Axios este folosit pentru apelurile HTTP către API-urile REST în locul clasicului fetch deoarece apelurile sunt mult mai scurte și mai simple deoarece Axios transformă răspunsurile automat în JSON și îți dă datele din el plus multe alte funcții de îmbunătățire a productivității [21]. Aplicația include două părți. Prima parte este alcătuită din ecranul de autentificare și înregistrare al utilizatorului iar a doua parte este dashboard-ul propriu-zis unde găsim pagina de prezentare generală (Overview), pagina de istoric cu grafice (History), pagina de calibrare manuală unde avem o hartă cu locația dispozitivului și putem controla releele și gradele motoarelor, pagina de management cont și pagina de împerechere a dispozitivului. Orice pagină are state-ul realizat prin useState  local în fiecare componentă fără biblioteci externe. Interfața folosește CSS simplu fără un framework și are un design întunecat cu accent verde bazat pe energia verde.
+Recharts este o bibliotecă ce se ocupă de vizualizarea datelor construită pentru React din componente React ce oferă un API declarativ și ușor de folosit pentru generarea de grafice interactive și customizabile [22]. În cadrul aplicației Recharts este utilizat în crearea graficelor cu reprezentare de date în format grafic liniar în șase categorii: solar, rețea electrică, curent baterie, sarcină internă, sarcină externă și un grafic mai mic pentru temperatură și SOC-ul  bateriei. În afară de graficul mic detaliat anterior restul graficelor permit vizualizarea a trei metrici: tensiune în volți (V), curent în amperi (A) și putere în wați (W).
+Leaflet este o bibliotecă JavaScript open-source concepută și optimizată pentru hărți pe dispozitive mobile, a fost folosită din cauza simplității și mai ales datorită nivelului de customizare care nu se întâlnește în platforme precum Google Maps, ceea ce a permis ca design-ul aplicației să rămână întunecat cu nuanțe de verde [23]. Harta are ca rol afișarea interactivă a locației GPS a dispozitivului. Afișarea propriu-zisă se face prin colectarea coordonatelor emise de GPS din telemetria trimisă de dispozitiv în WebSocket deci în teorie harta arată poziția în timp real ceea ce ar fi benefic pentru sisteme de energie solară mobile sau de mici dimensiuni care au o relocare constantă.
+WEATHER ! ! !
+
+3.4 PLATFORMA HARDWARE DE REFERINȚĂ 
+Pentru a demonstra funcționalitatea sistemului și a testa arhitectura propusă a fost implementată o platformă hardware ce folosește un ESP32-S3, un microcontroller dual core cu cip Wi-Fi și Bluetooth perfect pentru gestionarea comunicației cu backend-ul și totodată citirea senzorilor [24].
+Platforma integrează anumite componente hardware pentru crearea sistemului de energie fotovoltaică. Șapte senzori INA219 pentru măsurarea de tensiune și curent. INA219 comunică cu microcontrollerele prin I²C și folosește o rezistență pentru a calcula curentul prin căderea de tensiune și un convertor analog-digital intern pentru a măsura tensiunea [25]. Pentru a conecta șapte INA219 la un ESP32-S3 avem două variante: legarea fiecărui senzor la I²C direct respectiv fiecare serial data (SDA ) și serial clock (SCL ) la pinii corespunzători și a doua variantă este utilizarea unui multiplexor care are ca rol citirea celor șapte canale de I²C și expunerea lor pe un singur canal. Ambele variante sunt corecte, prima fiind posibilă doar dacă schimbăm adresele senzorilor deoarece ESP32-S3 are două canale I²C unde putem avea o adresă o singură dată per canal ceea ce înseamnă că putem avea un număr de maxim două adrese identice per ESP32-S3 fără un multiplexor. Modulul folosit are patru adrese configurabile ceea ce înseamnă că în modelul primei configurații ar fi trebuit gruparea a patru INA219 pe câte o adresă separată pe un canal I²C și încă o grupă cu restul senzorilor rămași cu 3 adrese, diferite între ele, conectate la celălalt canal I²C [26]. Acești senzori sunt pentru a monitoriza parametrii panoului solar, ai rețelei electrice, ai bateriei și ale sarcinilor. Un modul GPS NEO-6M [27] care ne furnizează latitudinea și longitudinea pentru localizarea dispozitivului respectiv calcularea poziției solare. GPS-ul spre deosebire de senzorii INA219, comunică prin UART, o comunicație serială punct-la-punct, modulul GPS fiind tratat ca alt dispozitiv și conexiunea lui cu microcontroller-ul se face folosind pinii RX  respectiv TX . Un alt senzor folosit în sistem este LM35 [28] , senzor ce monitorizează temperatura bateriei prin trimiterea către un pin de conversie analog-digital a tensiunii exprimată în mV, ulterior fiind împărțită la 10 rezultând temperatura. O altă componentă este modulul de relee cu 4 canale separate[29] ce este folosit pentru pornirea și oprirea traseelor: panou solar – sistem, baterie – sistem, rețea electrică – sistem, sistem – sarcină externă. O ultimă componentă esențială sistemului sunt cele două servomotoare MG996R [30]. Restul părților hardware pasive ce merită menționate: module coborâre tensiune , modul MPPT  (Maximum Power Point Tracker), baterie 2S2P cu BMS  (Battery Management System), Modul CC-CV XL4015 , Modul coborâre tensiune LM2596 [31], comutator cu 4 canale, panou solar 20W. Este important de menționat că platforma hardware are rol exclusiv de exemplu în integrarea unui microcontroller. Orice microcontroller conectat la un sistem de energie solară ce respectă protocolul WebSocket și formatul JSON definit pentru telemetrie și comenzi poate beneficia de conectare la sistemul de monitorizare și control al energiei fotovoltaice.
+3.6 JUSTIFICAREA ALEGERILOR TEHNOLOGICE
+Alegerile tehnologice au fost influențate atât de dorința de dezvoltare a unei aplicații SPA cât și de cerințele impuse în proiectarea și integrarea dispozitivelor IoT dintr-un sistem de energie fotovoltaică. Tabelul 3.1 prezintă motivul alegerii tehnologiilor respective cât și justificarea acestora.
+
+
+Tehnologie	Motivul alegerii
+Node.js și Express	Execuția nu se blochează in asteptarea operatiilor lente ; ecosistem usor de extins ; dezvoltare rapida
+PostgreSQL	Garantează integritatea datelor chair și sub stres ; suport DECIMAL pentru precizie numerică
+Prisma ORM	Verificarea la compilare anti erori ; modificarea automată a bazei de date ; schema declarativă ușor de întreținut
+React	Ecosistem larg bazat pe componente ; performanță execelentă pentru sistemele cu date în timp real
+Vite	Build foarte rapid ; actualizare instant a aplicatiei după modificarea codului ; configurare minimă necesară
+WebSocket	Mesaje bidirecționale ; nu necesită broker extern ; suport nativ în browser
+JWT	Nu ține stări între cereri ; implementare ușoara și ușor de folosit
+Recharts	Integrare specială cu React ; API intuitiv ; foarte modificabil
+Leaflet	Gratuit ; foarte modificabil ; eficient din punct de vedere al resurselor
+Weather API	
+Tabelul 3.1 – Justificarea alegerilor tehnologice
+4. DEZVOLTAREA APLICAȚIEI INFORMATICE
+4.1 ANALIZA ȘI PROIECTAREA SISTEMULUI
+Dezvoltarea sistemului a pornit cu dorinta de a rezolva integrarea platformelor web pentru monitorizarea si controlul sistemelor de energie solara cu hardware independent , capabil sa preia date de la orice dispozitiv IoT din domeniul respectiv compatibil cu protocolul de comunicatie propus oferindule functionalitatii de monitorizare in timp real , stocarea istoricului per termen lung si control de la distanta.
+4.1.1 Cerințe funcționale
+Sistemul trebuie sa permita crearea si autentificarea utilizatorilor folosind o adresa de email si o parola , iregistrarea dispozitivului IoT permisa doar dupa furnizarea cheii de autentificare pentru a prevenii iregistrarile de dispozitive straine si imperecherea lor cu contul utilizatorului prin furnizarea unei parola din partea backendului. Monitorizarea datelor trebuie facuta in timp real cu o latenta cat mai mica incluzand parametrii electrici pentru componenetele  sistemlui fotovoltaic precum parametrii panoului solar relei electrice bateriei saricii externe si saricii interne.
+Vizualizarea necesita : o diagrama simpla si usor de inteles a fluxului energetic cu animatii intuitive ce indica directia in care curentul se transfera de la o componenta la alta , graficele pentru istoric cu optiuni pe periade de timp si selectarea parametrilor doriti cu valori medii respectiv minime si maxime. Sistemul trebuie sa stocheze datele respective agregandule direct din conexiunea in timp real refactorizandule ulterior pe perioadele de timp necesare ( ultima zi , ultimele sapte zile , ultimele 30 zile , ultimul an , toata perioada ) pentru a optimiza spatiul consumat si viteza de afisare a graficelor de istoric pe website.
+Controlul de la distanta trebuie sa permita controlul a patru relee pricipale pentru panoul solar , baterie , retea electrica si sarica externa , setarea manuala a doua valori pentru modalitatea aleasa de miscare a sistemului fotovoltaic. Localizarea dispozitivului se realizeaza print-o harta a coodoronatelor GPS din telemertie ceea ce ne ajuta la afisarea detaliilor meteo precum temperatura exterioara si conditia meteo.
+
+
+4.1.2 Cerințe non-funcționale
+Transmiterea de date trebuie sa se realizeze cu o latenta redusa tinta fiind intervalul de o secunda . Aplicatia trebuie sa fie disponibila utilizatorilor public prin domeniu dedicat.Platforma software trebuie sa fie indepenedta fata de cea hardware si totodata compatibila cu orice microcontroller ce respecta protocolul WebSocket si formatul JSON definit. Interfata trebuie sa fie cat mai simpla si intuitiva pentru a nu incurca utilizatorul in butoane si meniuri.
+4.1.3 Arhitectura sistemului
+Arhitectura sistemului este compusa din patru componente (Figura 3.1) care comunica prin REST si WebSocket. REST API este utilizat in operatiile CRUD ( autentificare si inregistrare utilizator, inregistrare dispozitiv , iterogare date istorice si gestionare cont utilizator ) pe baza de cereri HTTP intre backend si frontend. Websocket este utilizat pentru comunicarile dintre backend frontend si dispozitiv in timp real . Conexiunile sunt intre dispozitiv si backend la endpoint-ul /esp autentificat prin HMAC-SHA256 dar si intre frontend si backend cu atentificare prin JWT. Fluxul pricipal de date este descris in detaliu in secțiunea 3.1.
+4.1.4 Protocolul de comunicație
+Dispozitivul IoT si backend-ul comunica intre ele folosind un protocol de comunicatie WebSocket bazat pe mesaje JSON si este de doua tipuri :  mesajele de telemetrie ce sunt constituite din datele trimise de dispozitiv la server si mesajele de comenzi ce sunt constituite din mesajele de comanda trimise de la server la dispozitiv. Mesajul de telemetrie este trimis odata la o secunda si contine toti parametrii presetati ai sistemului pentru a asigura monitorizarea si controlul unui sistem fotovoltaic. Structura mesajului cu exemple de valori este urmatoarea : 
+{
+"type": "telemetry",
+  "data": {
+    "solarV": , "solarA": 3.180, "solarW": 77.948,
+    "gridV": 230.100, "gridA": 1.450, "gridW": 333.645,
+    "battV": 12.800, "battA": 2.150, "battW": 27.520,
+    "battTemp": 34.2, "battSoc": 73.5, "battState": "charging",
+    "internalV": 12.100, "internalA": 0.480, "internalW": 5.808,
+    "externalV": 12.050, "externalA": 1.020, "externalW": 12.291,
+    "relay1": false, "relay2": false, "relay3": true, "relay4": true,
+    "manual": false,
+    "lat": 44.945, "long": 26.029,
+    "servoAz": 90, "servoEl": 45
+}
+}
+Campurile solarV/A/W, gridV/A/W, battV/A/W, externalV/A/W si internalV/A/W reprezinta tensiunea , curentul si puterea exprimate in V , A si respectiv W pentru fiecare componenta din sistem. Pentru baterie avem si campurile suplimentare battState ce indica starea bateriei de incarcare sau descarcare („charging”, „discharging” sau „idle”), battSoc ce indica procentul bateriei de incarcare cu valori de la 0 la 100. Pentru control avem cele patru relee relay1,relay2,relay3,relay4 care indica starea circuitelor adevarat si fals unde avedarat reprezinta faptul ca circuitul de la componenta hardware la sistemul fotovoltic este conectata si fals reprezinta faptul ca este deconectata. Campurile lat si long reprezinta coordonatele gps primite de la modulul GPS, iar servoAz si servoEl reprezinta pozitia motoarelor in grade servoAz reprezentand gradele pentru motorul responsabil de azimut si servoEl reprezinta gradele motorului responsabil de elevatia solara.
+Mesajul trimit de catre server dispozitivului este cel de comanda si contine intructiunile de control . Structura mesajului cu exemple de valori este urmatoarea: 
+{
+"type": "command",
+  "payload": {
+    "manual": true,
+    "relay1": false,
+    "relay2": false,
+    "relay3": true,
+    "relay4": true,
+    "servoAz": 120,
+    "servoEl": 45
+}
+}
+
+Comenzile trebuie sa fie procesate de dispozitiv doar dupa ce verifica ca modul este setat pe manual respectiv cand campul manual este setat pe true. La fel ca si in mesajul de telemetrie avem patru relee corespunzatoare cu deschiderea si inchiderea circuitelor respective si gradele motoarelor servoAz si servoEl.
+Autenficiarea din protocol se face in prima faza cand dispozitivul trimite un mesaj cu indentificatorul si semnatura HMAC serverul verificand semnatura folosind secretul partajat si accepta sau respinde conexiunea: 
+{
+  "type": "auth",
+  "deviceId": "ABCDE-12345",
+  "hmac": "23jn2k34…"
+}
+
+In a doua faza de autentificare dintre clientul web si server se trimite un mesaj din partea clientului web cu token-ul JWT ulterior serverul il decodeaza si verifica in baza de date dispozitivele utilizatorului pentru redirectionarea corecta a mesajelor :
+}  
+"type": "auth",
+"token": "eyJhbGciOiJIUzI1NiIs..."
+}
+
+
+
+
+
+	
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+Bibliografie
+
+[1] 	N. AL-Rousan și M. K. e. a. Mat Desa, „Renewable and Sustainable Energy Reviews,” Advances in solar photovoltaic tracking systems: A review, vol. Volume 82 Part 3, 2018. 
+[2] 	R. Singh și R. e. a. Pachauri, „Renewable and Sustainable Energy Reviews,” An imperative role of sun trackers in photovoltaic technology: A review, vol. Renewable and Sustainable Energy Reviews, 2018. 
+[3] 	A. Elbreki și K. e. a. Sopian, „Renewable and Sustainable Energy Reviews,” The role of climatic-design-operational parameters on combined PV/T collector performance: A critical review, vol. Volume 57, 2016. 
+[4] 	H. Alici și M. e. a. Tumay, „Designing and performance analysis of solar tracker system: a case study of Çukurova region,” în Design, Analysis, and Applications of Renewable Energy Systems, 2021. 
+[5] 	J. Reca-Cardeña și R. López-Luque, „Design Principles of Photovoltaic Irrigation Systems,” în Advances in Renewable Energies and Power Technologies, 2018. 
+[6] 	A. Hafez și N. e. a. Harag, „Renewable and Sustainable Energy Reviews,” Solar tracking systems: Technologies and trackers drive types – A review, vol. Volume 91, 2018. 
+[7] 	M. Phiri și C. I. e. a. Eke, „Deep learning techniques for solar tracking systems: A systematic literature review, research challenges, and open research directions,” vol. Volume 262, 2023. 
+[8] 	A. Al-Fuqaha, M. Guizani, M. Mohammadi, M. Aledhari și M. Ayyash, Internet of Things: A Survey on Enabling Technologies, Protocols, and Applications, Vol. %1 din %217, Nr. 4, IEEE Communications Surveys & Tutorials, 2015. 
+[9] 	R. T. Fielding, Architectural Styles and the Design of Network-based Software Architectures, I. University of California, Ed., Doctoral dissertation, 2000. 
+[10] 	I. E. T. F. (IETF), „RFC 6455 - The WebSocket Protocol,” Internet Engineering Task Force (IETF), 2011.
+[11] 	I. E. T. F. (IETF), „RFC 8259 - The JavaScript Object Notation (JSON) Data Interchange Format,” Internet Engineering Task Force (IETF), 2017.
+[12] 	O. Foundation, „Learn Node.js,” 2026. [Interactiv]. Available: https://nodejs.org/learn. [Accesat 18 01 2026].
+[13] 	O. Foundation, 2026. [Interactiv]. Available: https://expressjs.com/. [Accesat 18 01 2026].
+[14] 	T. P. G. D. Group, „PostgreSQL 16.14 Documentation,” 2026. [Interactiv]. Available: https://www.postgresql.org/docs/16/index.html. [Accesat 21 01 2026].
+[15] 	I. Prisma Data, „Prisma / docs,” 2026. [Interactiv]. Available: https://www.prisma.io/docs. [Accesat 21 01 2026].
+[16] 	I. E. T. F. (IETF), „RFC 7519 - JSON Web Token (JWT),” Internet Engineering Task Force (IETF), 2015.
+[17] 	I. E. T. F. (IETF), „RFC 2104 - HMAC: Keyed-Hashing for Message Authentication,” Internet Engineering Task Force (IETF), 1997.
+[18] 	I. Meta Platforms, „React - The Library for Web and Native User Interfaces,” 2026. [Interactiv]. Available: https://react.dev/learn. [Accesat 06 01 2026].
+[19] 	V. C. Evan You, „Vite - Next Generation Frontend Tooling,” 2026. [Interactiv]. Available: https://vite.dev/guide/. [Accesat 07 01 2026].
+[20] 	I. Remix Software, „React Router - Declarative Routing for React,” 2026. [Interactiv]. Available: https://reactrouter.com/home. [Accesat 15 01 2026].
+[21] 	A. C. Matt Zabriskie, „Axios - Promise based HTTP client for the browser and node.js,” 2026. [Interactiv]. Available: https://axios.rest/pages/getting-started/first-steps.html. [Accesat 29 01 2026].
+[22] 	R. Contributors, „Recharts - A composable charting library built on React components,” 2026. [Interactiv]. Available: https://recharts.github.io/en-US/guide/. [Accesat 03 05 2026].
+[23] 	L. C. Volodymyr Agafonkin, „Leaflet - An Open-Source JavaScript Library for Mobile-Friendly Interactive Maps,” 2026. [Interactiv]. Available: https://leafletjs.com/reference.html. [Accesat 25 05 2026].
+[24] 	E. Systems, „ESP32-S3 Series Datasheet,” 2024.
+[25] 	Texas Instruments, „INA219 Zerø-Drift, Bidirectional Current/Power Monitor With I2C Interface,” 2023.
+[26] 	Texas Instruments, „TCA9548A - Low-Voltage 8-Channel I2C Switch/Multiplexer,” 2022.
+[27] 	u-blox, „u-blox 6 GPS Modules Data Sheet,” 2022.
+[28] 	Texas Instruments, „LM35 Precision Centigrade Temperature Sensors,” 2020.
+[29] 	H. Technology, „Components101 - 4 Channel 5V Optical Isolated Relay Module,” [Interactiv]. Available: https://components101.com/sites/default/files/component_datasheet/Four-Channel-Relay-Module-Datasheet.pdf.
+[30] 	Components101, „Components101 - MG996R High Torque Metal Gear Dual Ball Bearing Servo,” [Interactiv]. Available: https://components101.com/sites/default/files/component_datasheet/MG996R%20Datasheet.pdf.
+
+
+
+
+
+
+
+
+	
