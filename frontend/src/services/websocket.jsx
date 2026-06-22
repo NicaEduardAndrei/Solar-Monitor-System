@@ -28,11 +28,11 @@ export function WebSocketProvider({ children }) {
 
         ws.onclose = () => {
             wsRef.current = null
-            setTimeout(() => {
-                if (!wsRef.current) {
-                    window.location.reload()
-                }
-            }, 3000)
+            // setTimeout(() => {
+            //     if (!wsRef.current) {
+            //         window.location.reload()
+            //     }
+            // }, 100000)
         }
 
         wsRef.current = ws

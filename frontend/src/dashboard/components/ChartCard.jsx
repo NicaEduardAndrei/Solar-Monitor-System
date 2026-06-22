@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import './ChartCard.css'
 import { API_BASE } from '../../../config'
+import axios from 'axios'
 
-const fieldMap = {
+const sensorFields = {
   solar: { v: 'solarV', vMin: 'solarVMin', vMax: 'solarVMax', a: 'solarA', aMin: 'solarAMin', aMax: 'solarAMax', w: 'solarW', wMin: 'solarWMin', wMax: 'solarWMax' },
   grid: { v: 'gridV', vMin: 'gridVMin', vMax: 'gridVMax', a: 'gridA', aMin: 'gridAMin', aMax: 'gridAMax', w: 'gridW', wMin: 'gridWMin', wMax: 'gridWMax' },
   battery: { v: 'battV', vMin: 'battVMin', vMax: 'battVMax', a: 'battA', aMin: 'battAMin', aMax: 'battAMax', w: 'battW', wMin: 'battWMin', wMax: 'battWMax', soc: 'battSoc', socMin: 'battSocMin', socMax: 'battSocMax' },
@@ -21,29 +22,29 @@ export function ChartCard({ title, category }) {
     const fetchData = async () => {
       setLoading(true)
       const token = localStorage.getItem('token')
-      const res = await fetch(`${API_BASE}/dashboard/charts/${category}?range=${range}`, {
+      const response = await axios.get(`${API_BASE}/dashboard/charts/${category}`, {
+        params: { range },
         headers: { Authorization: token }
       })
-      const json = await res.json()
-      setData(json.data || [])
+      setData(response.data.data || [])
       setLoading(false)
     }
     fetchData()
   }, [category, range])
 
-  const f = fieldMap[category]
+  const fields = sensorFields[category]
   const isAll = metric === 'all'
 
   const chartData = data.map(d => {
     const point = { time: new Date(d.timestamp).toLocaleString('ro-RO') }
     if (!isAll) {
-      point.value = d[f[metric]]
-      point.min = d[f[metric + 'Min']]
-      point.max = d[f[metric + 'Max']]
+      point.value = d[fields[metric]]
+      point.min = d[fields[metric + 'Min']]
+      point.max = d[fields[metric + 'Max']]
     } else {
-      point.v = d[f.v]
-      point.a = d[f.a]
-      point.w = d[f.w]
+      point.v = d[fields.v]
+      point.a = d[fields.a]
+      point.w = d[fields.w]
     }
     return point
   })

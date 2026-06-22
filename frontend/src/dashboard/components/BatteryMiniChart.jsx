@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import './ChartCard.css'
 import { API_BASE } from '../../../config'
+import axios from 'axios'
 
 export function BatteryMiniChart({ title }) {
   const [range, setRange] = useState('24h')
@@ -13,11 +14,11 @@ export function BatteryMiniChart({ title }) {
     const fetchData = async () => {
       setLoading(true)
       const token = localStorage.getItem('token')
-      const res = await fetch(`${API_BASE}/dashboard/charts/battery?range=${range}`, {
+      const response = await axios.get(`${API_BASE}/dashboard/charts/battery`, {
+        params: { range },
         headers: { Authorization: token }
       })
-      const json = await res.json()
-      setData(json.data || [])
+      setData(response.data.data || [])
       setLoading(false)
     }
     fetchData()

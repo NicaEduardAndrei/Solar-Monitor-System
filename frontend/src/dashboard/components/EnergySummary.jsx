@@ -28,9 +28,9 @@ export function EnergySummary() {
     }, [])
 
     function formatW(val) {
-        if (val > 1000000) return `${(val / 1000000).toFixed(2)} MW`
-        if (val > 1000) return `${(val / 1000).toFixed(2)} kW`
-        return `${val.toFixed(2)} W`
+        if (val > 1000000) return `${(val / 1000000).toFixed(2)} MWh`
+        if (val > 1000) return `${(val / 1000).toFixed(2)} kWh`
+        return `${val.toFixed(2)} Wh`
     }
 
     return (
