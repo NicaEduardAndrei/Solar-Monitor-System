@@ -3,9 +3,11 @@ import { useEffect, useState } from "react"
 import { Outlet, useNavigate, NavLink, useLocation } from "react-router-dom"
 import { API_BASE } from "../../config"
 import { weatherAPI } from "../../config"
-import { getLatestTelemetry, connectWebSocket } from "../services/websocket"
+import { useWebSocket } from "../services/websocket.jsx"
 
 import "./DashboardLayout.css"
+
+let lastWeatherRequest = 0
 
 import overview from "../assets/dashboard/sidebar/overview.png"
 import manualCalibration from "../assets/dashboard/sidebar/manualCalibration.png"
@@ -20,6 +22,7 @@ import pair from "../assets/dashboard/sidebar/pair.png"
 export function DashboardLayout() {
     const navigate = useNavigate()
     const location = useLocation()
+    const { data: telemetry } = useWebSocket()
 
     const [user, setUser] = useState(null)
     const [weather, setWeather] = useState(null)
@@ -50,23 +53,16 @@ export function DashboardLayout() {
 
 
     useEffect(() => {
+        if (!telemetry?.lat || !telemetry?.long) return
+        const now = Date.now()
+        if (now - lastWeatherRequest < 60000) return
+        lastWeatherRequest = now
 
-        connectWebSocket()
+        axios.get(`https://api.weatherapi.com/v1/current.json?key=${weatherAPI}&q=${telemetry.lat},${telemetry.long}`)
+            .then(res => setWeather(res.data))
 
-        const getWeather = async () => {
-            const telemetry = getLatestTelemetry()
-            if (!telemetry?.lat || !telemetry?.long) return
-
-            const response = await axios.get(
-                `https://api.weatherapi.com/v1/current.json?key=${weatherAPI}&q=${telemetry.lat},${telemetry.long}`
-            )
-            setWeather(response.data)
-        }
-
-        getWeather()
-        const interval = setInterval(getWeather, 1000)
-        return () => clearInterval(interval)
-    }, [])
+            console.log("[TEST] REQUEST FACUT ! ! !")
+    }, [telemetry])
 
     const hasDevice = user?.devices?.length > 0
 
@@ -113,7 +109,8 @@ export function DashboardLayout() {
                     </div>
 
                     <div className="sidebar-title">
-                        <span>Solar Panel</span>
+                        <span>PV System</span>
+                              
                         <img src={solarPanel} />
                     </div>
 

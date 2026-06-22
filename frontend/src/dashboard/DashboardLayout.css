@@ -32,6 +32,12 @@ body {
 .dashboard-content{
     display: flex;
     flex: 1;
+    overflow-y: auto;
+    height: 100vh;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE / Edge */
 }
 
 .sidebar-container {

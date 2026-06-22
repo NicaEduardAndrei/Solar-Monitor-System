@@ -1,6 +1,6 @@
 import Switch from "react-switch";
 import { useState, useEffect, useRef } from "react";
-import { connectWebSocket, onTelemetry, sendCommand } from "../../services/websocket"
+import { useWebSocket } from "../../services/websocket.jsx"
 import axios from "axios";
 import { API_BASE } from "../../../config.js"
 import animationLoading from "../../assets/dashboard/animation/loading-animations/loading-animation.gif"
@@ -28,7 +28,7 @@ const greenIcon = L.divIcon({
 export function ManualCalibrationPage() {
 
     const [deviceId, setDeviceId] = useState(null)
-    const [liveData, setLiveData] = useState(null)
+    const { data: liveData, sendCommand } = useWebSocket()
     const servoAzRef = useRef(null)
     const servoElRef = useRef(null)
 
@@ -43,14 +43,6 @@ export function ManualCalibrationPage() {
             }
         }
         fetchDevice()
-    }, [])
-
-    useEffect(() => {
-        connectWebSocket()
-        const unsubscribe = onTelemetry((data) => {
-            setLiveData(data);
-        })
-        return () => unsubscribe()
     }, [])
 
     if (!liveData) return (

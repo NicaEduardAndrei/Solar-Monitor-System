@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react"
-import { IP } from "../../../config.js"
+import { useWebSocket } from "../../services/websocket.jsx"
 import "./OverviewPage.css"
 
 import animationLoading from "../../assets/dashboard/animation/loading-animations/loading-animation.gif"
@@ -12,21 +11,7 @@ import internal from "../../assets/dashboard/animation/internal.png"
 import house from "../../assets/dashboard/animation/house.png"
 
 export function OverviewPage() {
-    const [liveData, setLiveData] = useState(null)
-
-    useEffect(() => {
-        const token = localStorage.getItem("token")
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-        const ws = new WebSocket(`${protocol}//${IP}`)
-
-        ws.onopen = () => ws.send(JSON.stringify({ type: "auth", token }))
-        ws.onmessage = (e) => {
-            const msg = JSON.parse(e.data)
-            if (msg.type === "telemetry") setLiveData(msg.data)
-        }
-        ws.onclose = () => console.log("WebSocket disconnected")
-        return () => ws.close()
-    }, [])
+    const { data: liveData } = useWebSocket()
 
     if (!liveData) return (
         <>

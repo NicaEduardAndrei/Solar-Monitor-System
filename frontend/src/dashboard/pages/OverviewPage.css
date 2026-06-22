@@ -23,6 +23,10 @@
 
 .energy-flow {
     width: 55dvw;
+    max-height: 90%;
+    max-width: 90%;
+    height: auto;
+    object-fit: contain;
 }
 
 .energy-flow path {
