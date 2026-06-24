@@ -13,10 +13,10 @@ export function FaqPage() {
                     </div>
                     <div className="faq-text">
                         <p>When you first create your account, you will be automatically redirected to the <strong>Link Device</strong> page. You can also access the <strong>User Manual</strong> page from the sidebar without pairing a device first.</p>
-                        <p><strong>Step 1 — Connect to your device's WiFi:</strong> When your device powers on, it creates its own WiFi network called <strong>SolarPanel-Config</strong> (password: <strong>12345678</strong>). Connect your phone or laptop to this network.</p>
-                        <p><strong>Step 2 — Configure WiFi:</strong> After connecting, open a browser and go to the <strong>IP address displayed on your device screen</strong> (shown after the battery checkup completes). You will see a configuration page where you can enter your home WiFi name and password. Save the settings and the device will restart to connect to your network.</p>
-                        <p><strong>Step 3 — Get your Device ID and Password:</strong> Once the device connects to the internet, it will display a <strong>Device ID</strong> and a <strong>Password</strong> on its built-in screen. These are unique to your device. <strong>Note:</strong> If the screen shows "Server: off" (red), the password may not appear yet. This is normal — the device will automatically attempt to reconnect to the server periodically. Once the server comes back online, the password will be generated and displayed. You don't need to do anything, just wait.</p>
-                        <p><strong>Step 4 — Link on the website:</strong> Go to the Link Device page on this website, enter the Device ID and Password exactly as shown on the screen, and click <strong>Link</strong>. Once paired, you will be redirected to the Dashboard Overview page.</p>
+                        <p><strong>Step 1 — Register your device:</strong> Your IoT device must first register with the server using the device registration API. This requires a shared secret key provided by the system administrator. The device generates a unique identifier and creates an HMAC signature for authentication.</p>
+                        <p><strong>Step 2 — Obtain credentials:</strong> After successful registration, the server provides a device password (claim secret) that is used to link the device to your account. This password is displayed on the device interface or can be retrieved through the device's configuration portal.</p>
+                        <p><strong>Step 3 — Connect to the network:</strong> Ensure your device is connected to the internet and can reach the server. The device will establish a WebSocket connection and authenticate using the HMAC signature.</p>
+                        <p><strong>Step 4 — Link on the website:</strong> Go to the Link Device page on this website, enter the Device ID and Password exactly as provided by your device, and click <strong>Link</strong>. Once paired, you will be redirected to the Dashboard Overview page.</p>
                         <p>Each device can only be linked to one account. If you want to pair a different device, you must first unlink the current one from Account Settings.</p>
                     </div>
                 </div>
@@ -35,14 +35,13 @@ export function FaqPage() {
                         <p>• <strong>Battery SOC</strong> — State of Charge, the battery percentage (e.g., 73% means the battery is 73% full)</p>
                         <p>• <strong>Battery State</strong> — Shows whether the battery is currently "charging", "discharging", or "idle"</p>
                         <p>• <strong>Battery Temp</strong> — The current battery temperature in degrees Celsius</p>
-                        <p><strong>Internal Load</strong> — Shows how much power is being consumed by internal systems connected to your setup. This includes the servo motors used for solar panel tracking.</p>
+                        <p><strong>Internal Load</strong> — Shows how much power is being consumed by internal systems connected to your setup.</p>
                         <p><strong>External Load / Out</strong> — Shows how much power is being consumed by external devices or your house. This represents the energy going out to power your appliances.</p>
                         <p><strong>Connection Status:</strong> At the bottom left of the diagram, you can see the status of each connection:</p>
                         <p>• <strong>Grid</strong> — Shows "Open" (connected) or "Closed" (disconnected)</p>
                         <p>• <strong>Solar</strong> — Shows "Open" (connected) or "Closed" (disconnected)</p>
                         <p>• <strong>Battery</strong> — Shows "Open" (connected) or "Closed" (disconnected)</p>
                         <p>• <strong>External Load</strong> — Shows "Open" (connected) or "Closed" (disconnected)</p>
-                        <p><strong>Mode indicator:</strong> The device screen also shows the current operating mode: <strong>Hybrid</strong> (both solar and grid active), <strong>Solar</strong> (only solar), <strong>Grid</strong> (only grid), or <strong>Off</strong>.</p>
                     </div>
                 </div>
 
@@ -68,7 +67,6 @@ export function FaqPage() {
                         <p>• <strong>Solar</strong> — Total energy produced by your solar panels</p>
                         <p>• <strong>Grid</strong> — Total energy drawn from the electrical grid</p>
                         <p>• <strong>Consumption</strong> — Total energy consumed by your system (both internal and external loads combined)</p>
-                        <p>Note: This system does not inject energy back into the grid. All solar energy is either stored in the battery or consumed by your loads.</p>
                         <p><strong>Understanding gaps in charts:</strong></p>
                         <p>• If you see <strong>values of 0</strong> across all metrics, it means your device was offline (no internet connection) during that period</p>
                         <p>• If you see <strong>complete gaps with no lines at all</strong>, it means the server was offline during that period</p>
@@ -80,42 +78,33 @@ export function FaqPage() {
                         <span>Manual Calibration</span>
                     </div>
                     <div className="faq-text">
-                        <p>The Manual Calibration page gives you direct control over your solar system. By default, the system operates in <strong>Automatic Mode</strong>, where it handles solar panel tracking and relay switching on its own.</p>
-                        <p><strong>Manual Mode:</strong> Toggle the Manual Mode switch to take full control. When enabled, you can:</p>
-                        <p>• <strong>Control each relay individually</strong> — Toggle Solar, Grid, Battery, and Load connections on or off independently. For example, you can disconnect the grid and run purely on solar, or disconnect solar and switch to grid power.</p>
-                        <p>• <strong>Adjust solar panel position</strong> — Set the horizontal angle (azimuth, 0-180 degrees) and vertical angle (elevation, 20-90 degrees) of your solar panels. This allows you to manually aim the panels toward the sun or any direction you prefer.</p>
-                        <p><strong>GPS Map:</strong> The map on this page shows the real-time GPS location of your device. This is the same location used by the system to calculate the optimal solar panel angles for sun tracking in automatic mode.</p>
-                        <p><strong>How automatic mode works:</strong> When Manual Mode is off, the system uses your GPS location (or manual coordinates if configured) and the current date/time from internet time servers to calculate where the sun is in the sky. It then automatically adjusts the solar panels to face the sun throughout the day. When the sun drops below 20 degrees elevation (sunset), the panels return to a resting sunrise position (horizontal 180°, vertical 20°).</p>
-                        <p><strong>Note:</strong> Automatic solar tracking requires an internet connection to sync time from internet time servers. If your device loses internet, the panels will stop tracking until the connection is restored.</p>
-                        <p><strong>Real-time feedback:</strong> Changes you make on this page are sent to your device through the internet connection. The switches on this page update in real time based on the device's actual state, not just when you click them. If you toggle a switch and it takes a few seconds to reflect the change on screen, this is normal — it simply means that's how long it took for the command to reach your device and for the device to respond.</p>
+                        <p>The Manual Calibration page gives you direct control over your solar system. The availability of controls depends on your device's capabilities and the sensors it reports.</p>
+                        <p><strong>Manual Mode:</strong> If your device supports manual control, you can toggle the Manual Mode switch to take direct control. When enabled, you may be able to:</p>
+                        <p>• <strong>Control relays individually</strong> — Toggle power connections on or off independently, if your device has relay control capabilities</p>
+                        <p>• <strong>Adjust device parameters</strong> — Set values for configurable parameters such as motor positions or other actuators, if supported by your device</p>
+                        <p><strong>GPS Map:</strong> If your device provides GPS coordinates, the map on this page shows the real-time location of your device. This is useful for mobile solar systems or for verifying the installation location.</p>
+                        <p><strong>Real-time feedback:</strong> Changes you make on this page are sent to your device through the WebSocket connection. The controls on this page update in real time based on the device's actual state. If you toggle a switch and it takes a few seconds to reflect the change on screen, this is normal — it simply means that's how long it took for the command to reach your device and for the device to respond.</p>
+                        <p><strong>Note:</strong> Not all devices support manual control. If the controls are not available or do not respond, your device may be configured for automatic operation only, or may not support remote command execution.</p>
                     </div>
                 </div>
 
                 <div className="faq-section">
                     <div className="faq-header">
-                        <span>Hardware & Physical Switches</span>
+                        <span>Troubleshooting</span>
                     </div>
                     <div className="faq-text">
-                        <p>Your solar system includes physical hardware components that you should be familiar with:</p>
-                        <p><strong>Power Connections:</strong></p>
-                        <p>• <strong>USB-C Input (15V)</strong> — This is the power input for the Grid connection. Connect your grid power supply here.</p>
-                        <p>• <strong>8-Pin Connector</strong> — This cable connects to your solar panels and tracking motors.</p>
-                        <p>• <strong>External Load Output</strong> — Two wires providing 5V at 2.5A maximum (12.5W max). Use this to power small external devices from your solar system.</p>
-                        <p><strong>Emergency Physical Switches:</strong> Your system has <strong>3 physical switches</strong> (one for Solar, one for Grid, and one for Battery) that act as manual emergency overrides. These allow you to physically disconnect a power source even if you have no internet connection or cannot access the website. Use these switches if you need to immediately cut off solar, grid, or battery power for safety reasons.</p>
-                        <p><strong>Device Screen:</strong> The built-in screen on your device displays real-time information including:</p>
-                        <p>• <strong>WiFi status</strong> — Whether the device is connected to your home network</p>
-                        <p>• <strong>Server status</strong> — Whether the device is communicating with the cloud server</p>
-                        <p>• <strong>Solar power</strong> — Current voltage, current, and wattage from your panels</p>
-                        <p>• <strong>Battery</strong> — Charge percentage, temperature, voltage, current, and wattage</p>
-                        <p>• <strong>External load</strong> — Power being consumed by connected appliances</p>
-                        <p>• <strong>Grid</strong> — Power being drawn from the electrical grid</p>
-                        <p>• <strong>Device ID and Password</strong> — Needed for pairing with the website</p>
-                        <p>• <strong>Connection status</strong> — Shows which circuits are on or off (Solar, Grid, Battery, Load)</p>
-                        <p>• <strong>Operating mode</strong> — Shows the current mode (Hybrid, Solar, Grid, or Off) and whether the system is in Auto or Manual mode</p>
-                        <p><strong>Solar Tracking Motors:</strong> Your system uses two motors to physically move the solar panels. One motor controls the horizontal direction (left/right, 0-180 degrees) and the other controls the vertical angle (up/down, 20-90 degrees). In automatic mode, these motors adjust throughout the day to keep the panels facing the sun.</p>
-                        <p><strong>Manual GPS Configuration:</strong> If your device does not have a GPS module or if the GPS signal is weak, you can manually set the coordinates through the device's configuration portal. Connect to the SolarPanel-Config WiFi network, visit the <strong>IP address displayed on your device screen</strong> in your browser, and enter your latitude and longitude in the Manual GPS section. Leave both values at 0 to use the physical GPS module.</p>
-                        <p><strong>Battery:</strong> The system uses a rechargeable lithium-ion battery pack. The battery charges from solar panels during the day and discharges to power your loads when solar production is low or at night. The system monitors the battery's charge level, temperature, and health continuously.</p>
-                        <p><strong>Boot Process:</strong> When the device powers on, it performs a battery check that takes about 10 seconds. During this time, the system temporarily disconnects solar, grid, and load to get an accurate battery reading. After the check, all connections are restored and normal operation begins. The device then initializes the solar tracking motors, connects to your WiFi network, syncs time from internet servers, and establishes a secure connection to the cloud server.</p>
+                        <p><strong>Overview page shows "Connecting..." for too long:</strong></p>
+                        <p>• Make sure your device has power and is connected to the internet</p>
+                        <p>• Verify the device has successfully registered with the server</p>
+                        <p>• Check that your network connection is working properly</p>
+                        <p>• Try refreshing the page</p>
+                        <p><strong>No live data on the Overview page:</strong> Check that your device is powered on and has an active WebSocket connection to the server. The device should be sending telemetry data at regular intervals.</p>
+                        <p><strong>Charts show 0 values:</strong> This means your device was offline (no internet connection) during that time period. The telemetry data was not transmitted to the server.</p>
+                        <p><strong>Charts have gaps with no lines:</strong> This means the server was offline during that period. No data was processed or stored.</p>
+                        <p><strong>"Invalid token" error:</strong> Your session has expired. Simply log in again to continue using the platform.</p>
+                        <p><strong>Device cannot connect to the server:</strong> Verify that your device has the correct server address and that the shared secret key is properly configured. Check firewall settings and ensure the WebSocket port is accessible.</p>
+                        <p><strong>Commands not being executed:</strong> Ensure your device is in manual mode (if applicable) and that it properly processes incoming WebSocket messages. Check the device logs for any command parsing errors.</p>
+                        <p><strong>GPS not working:</strong> If your device has a GPS module, ensure it has a clear view of the sky for satellite acquisition. GPS coordinates are optional — the platform will function without location data, but the map feature will not display your device location.</p>
                     </div>
                 </div>
 
@@ -146,21 +135,68 @@ export function FaqPage() {
 
                 <div className="faq-section">
                     <div className="faq-header">
-                        <span>Troubleshooting</span>
+                        <span>Developer Integration Guide</span>
                     </div>
                     <div className="faq-text">
-                        <p><strong>Overview page shows "Connecting..." for too long:</strong></p>
-                        <p>• Make sure your device has power</p>
-                        <p>• Check the device screen — it should show WiFi: on (green) and Server: on (green)</p>
-                        <p>• Make sure your home internet is working</p>
-                        <p>• Try refreshing the page</p>
-                        <p><strong>No live data on the Overview page:</strong> Check that your device is powered on and connected to WiFi. The screen on the device will show red indicators if WiFi or Server is off. The connection will automatically attempt to re-establish when the device comes back online.</p>
-                        <p><strong>Charts show 0 values:</strong> This means your device was offline (no internet connection) during that time period. The data was not collected.</p>
-                        <p><strong>Charts have gaps with no lines:</strong> This means the server was offline during that period. No data was processed.</p>
-                        <p><strong>"Invalid token" error:</strong> Your session expires after 1 hour of inactivity. Simply log in again to continue.</p>
-                        <p><strong>Device cannot connect to WiFi:</strong> If the device screen shows WiFi: off (red), connect to the SolarPanel-Config network and re-enter your WiFi credentials through the configuration page at the <strong>IP address displayed on your device screen</strong> (shown after the battery checkup completes).</p>
-                        <p><strong>GPS not working:</strong> If you're unsure whether your device has a GPS signal or not, check the indicator light on the bottom right of the device enclosure. A red LED blinking on and off once per second indicates the GPS module is actively searching for satellites. If the LED is not blinking, the GPS module may not be connected or may have a hardware issue.</p>
-                        <p><strong>Solar panels not tracking the sun:</strong> Make sure the system is not in Manual Mode. Check the Manual Calibration page — if Manual Mode is turned on, the panels will not move automatically. Also ensure your device has a GPS signal (the map on Manual Calibration should show your location) or that you have configured manual GPS coordinates through the device portal. Finally, verify that your device has an internet connection — solar tracking requires time synchronization from internet servers to calculate the sun's position.</p>
+                        <p>This platform is designed to work with any IoT device that implements the communication protocol. This section provides technical details for developers who want to integrate their custom hardware with the monitoring system.</p>
+                        
+                        <p><strong>1. Device Registration</strong></p>
+                        <p>Before a device can send data, it must be registered with the server. Send a POST request to the registration endpoint:</p>
+                        <p><code>POST /api/device/register</code></p>
+                        <p>Request body:</p>
+                        <p className="code"><code>{'{"deviceId": "ABCDE-12345", "hmac": "23jn2k34..."}'}</code></p>
+                        <p>The HMAC is created using HMAC-SHA256 with the shared secret key and the device ID. The server validates the signature and returns the device password (claim secret) needed for linking the device to a user account.</p>
+                        
+                        <p><strong>2. WebSocket Connection</strong></p>
+                        <p>After registration, establish a WebSocket connection to:</p>
+                        <p><code>wss://your-domain.com/esp</code></p>
+                        <p>Immediately after connection, send an authentication message:</p>
+                        <p className="code"><code>{'{"type": "auth", "deviceId": "ABCDE-12345", "hmac": "23jn2k34..."}'}</code></p>
+                        <p>The server validates the signature and accepts or rejects the connection.</p>
+                        
+                        <p><strong>3. Telemetry Data Format</strong></p>
+                        <p>Send telemetry data as JSON messages at regular intervals (typically once per second). The telemetry message must include the following fields:</p>
+                        <p className="code"><code>{'{"type": "telemetry", "data": {"solarV": 18.5, "solarA": 3.18, "solarW": 77.95, "gridV": 230.1, "gridA": 1.45, "gridW": 333.65, "battV": 12.8, "battA": 2.15, "battW": 27.52, "battTemp": 34.2, "battSoc": 73.5, "battState": "charging", "internalV": 12.1, "internalA": 0.48, "internalW": 5.81, "externalV": 12.05, "externalA": 1.02, "externalW": 12.29, "relay1": false, "relay2": false, "relay3": true, "relay4": true, "manual": false, "lat": 44.945, "long": 26.029, "servoAz": 90, "servoEl": 45}}'}</code></p>
+                        <p>Field descriptions:</p>
+                        <p>• <strong>solarV/A/W</strong> — Solar panel voltage (V), current (A), power (W)</p>
+                        <p>• <strong>gridV/A/W</strong> — Grid voltage, current, power</p>
+                        <p>• <strong>battV/A/W</strong> — Battery voltage, current, power (positive = charging, negative = discharging)</p>
+                        <p>• <strong>battTemp</strong> — Battery temperature in Celsius</p>
+                        <p>• <strong>battSoc</strong> — Battery state of charge (0-100%)</p>
+                        <p>• <strong>battState</strong> — Battery state: "charging", "discharging", or "idle"</p>
+                        <p>• <strong>internalV/A/W</strong> — Internal load voltage, current, power</p>
+                        <p>• <strong>externalV/A/W</strong> — External load voltage, current, power</p>
+                        <p>• <strong>relay1-4</strong> — Relay states (true = open/disconnected, false = closed/connected)</p>
+                        <p>• <strong>manual</strong> — Manual mode flag (true = manual control enabled)</p>
+                        <p>• <strong>lat, long</strong> — GPS coordinates (optional)</p>
+                        <p>• <strong>servoAz, servoEl</strong> — Servo motor positions in degrees (optional)</p>
+                        
+                        <p><strong>4. Command Messages</strong></p>
+                        <p>The server sends command messages to devices for remote control. Devices should only execute commands when the manual mode flag is true:</p>
+                        <p className="code"><code>{'{"type": "command", "payload": {"manual": true, "relay1": false, "relay2": false, "relay3": true, "relay4": true, "servoAz": 120, "servoEl": 45}}'}</code></p>
+                        <p>Command fields:</p>
+                        <p>• <strong>manual</strong> — Manual mode flag</p>
+                        <p>• <strong>relay1-4</strong> — Relay states to set</p>
+                        <p>• <strong>servoAz</strong> — Azimuth servo position (0-180 degrees)</p>
+                        <p>• <strong>servoEl</strong> — Elevation servo position (20-90 degrees)</p>
+                        
+                        <p><strong>5. Integration Steps Summary</strong></p>
+                        <p>• Implement WebSocket client on your device</p>
+                        <p>• Configure device with shared secret key from system administrator</p>
+                        <p>• Generate unique device ID and create HMAC-SHA256 signature</p>
+                        <p>• Call POST /api/device/register with device ID and HMAC</p>
+                        <p>• Store the returned claim secret for user linking</p>
+                        <p>• Connect to WebSocket endpoint wss://domain/esp</p>
+                        <p>• Send authentication message with device ID and HMAC</p>
+                        <p>• Send telemetry JSON messages at regular intervals</p>
+                        <p>• Listen for and process incoming command messages</p>
+                        <p>• Display device ID and claim secret for user to link the device</p>
+                        
+                        <p><strong>6. Data Aggregation</strong></p>
+                        <p>The server aggregates incoming telemetry data into 5-minute intervals, calculating average, minimum, and maximum values. This data is further aggregated into hourly, daily, and weekly intervals for long-term storage and efficient historical queries.</p>
+                        
+                        <p><strong>7. Reference Implementation</strong></p>
+                        <p>A reference hardware implementation using ESP32-S3 microcontroller is available as an example. This implementation includes INA219 current sensors for power measurement, GPS module for location tracking, relay module for circuit control, and servo motors for solar panel positioning. The reference system demonstrates how to read sensors, format telemetry data, establish WebSocket connection, and process incoming commands.</p>
                     </div>
                 </div>
 
