@@ -53,13 +53,11 @@ app.use(cors({
 }));
 
 
-
-//Routes
 app.use("/api/auth", authRoutes)
 app.use("/api/dashboard", authMiddleware, dashboardRoutes)
 app.use("/api/device", deviceMiddleware, deviceRoutes)
 
-// frontend in production
+
 if (process.env.NODE_ENV === "production") {
     const distPath = path.resolve(dir, "../../frontend/dist")
     app.use(express.static(distPath))

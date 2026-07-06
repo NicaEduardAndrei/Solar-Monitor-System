@@ -87,10 +87,6 @@ export function OverviewPage() {
                     <text id="Out" x="538.20" y="600.29">Out</text>
 
 
-
-
-
-
                     <text className="w-value w-solar" x="202" y="71" textAnchor="middle">
                         {liveData.solarW?.toFixed(3)} W
                     </text>
@@ -100,7 +96,6 @@ export function OverviewPage() {
                     <text className="w-value w-solar" x="90" y="160" textAnchor="middle">
                         {liveData.solarA?.toFixed(3)} A
                     </text>
-
 
 
 

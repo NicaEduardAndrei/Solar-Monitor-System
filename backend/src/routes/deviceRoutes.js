@@ -17,11 +17,6 @@ function generateClaimSecret(length = 10){
     return result
 }
 
-
-// Trebuie apelat orice cu deviceId si hmac pentru middleware
-
-
-
 router.post("/register", async (req, res) => {
     const existingDevice = await prisma.device.findUnique({
         where: {
