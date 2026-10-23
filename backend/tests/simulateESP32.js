@@ -1,15 +1,21 @@
 import WebSocket from 'ws'
 import crypto from 'crypto'
+import dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const DEVICE_ID = 'TEST-01'
-const DEVICE_SECRET = 'NicaEduardAndreiDeviceINFO'
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
+
+const DEVICE_ID = process.env.DEVICE_ID || 'TEST-01'
+const DEVICE_SECRET = process.env.DEVICE_SECRET
 
 const hmac = crypto
     .createHmac('sha256', DEVICE_SECRET)
     .update(DEVICE_ID)
     .digest('hex')
 
-const ws = new WebSocket('wss://nicaandrei.site/esp')
+const ws = new WebSocket(process.env.WS_URL || 'ws://localhost:3000/esp')
 
 const state = {
     manual: false,

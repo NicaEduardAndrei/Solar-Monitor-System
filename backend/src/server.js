@@ -1,13 +1,10 @@
-//cloudflared tunnel run licenta-tunnel
-
-
+import "dotenv/config"
 import express from "express"
 import authRoutes from "./routes/authRoutes.js"
 import authMiddleware from "./middleware/authMiddleware.js"
 import dashboardRoutes from "./routes/dashboardRoutes.js"
 import deviceRoutes from "./routes/deviceRoutes.js"
 import cors from "cors"
-import dotenv from "dotenv"
 import deviceMiddleware from "./middleware/deviceMiddleware.js"
 import websocket from "./services/websocket.js"
 import "./services/aggregator.js"
@@ -31,13 +28,12 @@ refactorProcess.on('exit', (code) => {
 
 
 
-dotenv.config()
 const file = fileURLToPath(import.meta.url)
 const dir = path.dirname(file)
 const DOMAIN = process.env.DOMAIN || "localhost"
 
 const app = express()
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3000
 
 app.use(express.json())
 

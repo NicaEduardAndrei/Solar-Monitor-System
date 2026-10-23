@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useState, useRef, useEffect } from 'react'
-import { IP } from "../../config"
+import { WS_BASE } from "../../config"
 
 const WebSocketContext = createContext(null)
 
@@ -12,8 +12,7 @@ export function WebSocketProvider({ children }) {
         const token = localStorage.getItem("token")
         if (!token) return
 
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-        const ws = new WebSocket(`${protocol}//${IP}`)
+        const ws = new WebSocket(WS_BASE)
 
         ws.onopen = () => {
             ws.send(JSON.stringify({ type: "auth", token }))
@@ -53,6 +52,7 @@ export function WebSocketProvider({ children }) {
 }
 
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useWebSocket() {
     return useContext(WebSocketContext)
 }

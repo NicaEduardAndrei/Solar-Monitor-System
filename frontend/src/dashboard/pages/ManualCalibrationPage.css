@@ -159,5 +159,5 @@
 }
 
 .leaflet-tile-pane {
-    filter: brightness(1) contrast(1) sepia(1) saturate(1.2) hue-rotate(90deg);
+    filter: brightness(0.5) contrast(1) sepia(0.3) saturate(7) hue-rotate(80deg);
 }

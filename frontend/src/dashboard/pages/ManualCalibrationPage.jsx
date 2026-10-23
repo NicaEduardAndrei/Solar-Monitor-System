@@ -158,7 +158,7 @@ export function ManualCalibrationPage() {
 
                     <div className="calibration-map">
                         <MapContainer center={[liveData.lat, liveData.long]} zoom={14} className="map-container">
-                            <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+                            <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}" />
                             <Marker position={[liveData.lat, liveData.long]} icon={greenIcon} />
                         </MapContainer>
                     </div>
